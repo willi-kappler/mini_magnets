@@ -1,5 +1,6 @@
 // Rust modules
-use std::time::Duration;
+use std::time::{Instant, Duration};
+use std::thread;
 
 // External modules
 use sdl2::pixels::Color;
@@ -46,10 +47,20 @@ pub fn main() {
         game_screen: GameScreen::Menu,
     };
 
+    let mut instant = Instant::now();
+    let mut sleep_time = 0i64; // TODO: Move to game_state
+    let frame_duration = 16i64; // TODO: Move to game_state
+
     while !game_state.quit {
         process(&mut game_state, &mut event_pump);
         update(&mut game_state);
         draw(&mut game_state, &mut canvas);
+
+        sleep_time = frame_duration - (instant.elapsed().as_millis() as i64);
+        if sleep_time > 0 {
+            thread::sleep(Duration::from_millis(sleep_time as u64))
+        }
+        instant = Instant::now();
     }
 
     /*
