@@ -45,20 +45,20 @@ pub fn main() {
     let mut game_state = GameState {
         quit: false,
         game_screen: GameScreen::Menu,
+        sleep_time: 0,
+        frame_duration: 16,
     };
 
     let mut instant = Instant::now();
-    let mut sleep_time = 0i64; // TODO: Move to game_state
-    let frame_duration = 16i64; // TODO: Move to game_state
 
     while !game_state.quit {
         process(&mut game_state, &mut event_pump);
         update(&mut game_state);
         draw(&mut game_state, &mut canvas);
 
-        sleep_time = frame_duration - (instant.elapsed().as_millis() as i64);
-        if sleep_time > 0 {
-            thread::sleep(Duration::from_millis(sleep_time as u64))
+        game_state.sleep_time = game_state.frame_duration - (instant.elapsed().as_millis() as i64);
+        if game_state.sleep_time > 0 {
+            thread::sleep(Duration::from_millis(game_state.sleep_time as u64))
         }
         instant = Instant::now();
     }
@@ -111,9 +111,12 @@ fn update(game_state: &mut GameState) {
 }
 
 fn draw(game_state: &mut GameState, canvas: &mut Canvas<Window>) {
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.clear();
+
     match game_state.game_screen {
         GameScreen::Menu => {
-            menu::draw(canvas);
+            menu::draw(game_state, canvas);
         },
         _ => {
             

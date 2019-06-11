@@ -28,6 +28,6 @@ pub fn update() {
 
 }
 
-pub fn draw(canvas: &mut Canvas<Window>) {
+pub fn draw(game_state: &GameState, canvas: &mut Canvas<Window>) {
 
 }
