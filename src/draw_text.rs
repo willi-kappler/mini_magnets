@@ -4,12 +4,17 @@ use sdl2::video::Window;
 use sdl2::rect::Rect;
 use sdl2::render::Texture;
 
-pub struct Font {
-    width: u32,
-    height: u32,
-    rows: u32,
-    cols: u32,
-    texture: Texture<'static>,
+pub struct Font<'a> {
+    // Width of a single character
+    pub width: u32,
+    // Height of a single character
+    pub height: u32,
+    // Number of rows in font atlas
+    pub rows: u8,
+    // Number of cols in font atlas
+    pub cols: u8,
+    // The actual image containing the font pixel data
+    pub texture: Texture<'a>,
 }
 
 // let temp_surface = sdl2::surface::Surface::load_bmp(Path::new("assets/characters.bmp"))?;
@@ -35,34 +40,44 @@ pub struct Font {
 // 65 A Capital A
 // 90 Z Capital Z
 
-pub fn draw_char(canvas: &mut Canvas<Window>, current_font: &Font, x: u32, y: u32, char: u8) {
-    let mut source = Rect::new(0, 0, current_font.width, current_font.height);
+pub fn draw_char(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, c: u8) {
+    let index: u8;
 
-    match char {
+    match c {
         32 => {
             // Nothing to do
             return
         },
         48..=57 => {
             // Number
-
+            index = c - 48;
         },
         65..=90 => {
             // Alphabetic character
-
+            index = c - 55;
         }
         _ => {
             // Not supported character
-
+            return
         },
     }
 
-    let destination = Rect::new(x as i32, y as i32, current_font.width, current_font.height);
-    canvas.copy(&current_font.texture, Some(source), Some(destination));
+    let row = index / font.cols;
+    let col = index - (row * font.cols);
+
+    let w = font.width;
+    let h = font.height;
+
+    let source = Rect::new(((col as u32) * w) as i32, ((row as u32) * h) as i32, w, h);
+    let destination = Rect::new(x as i32, y as i32, w, h);
+    canvas.copy(&font.texture, Some(source), Some(destination)).unwrap();
 }
 
-pub fn draw_text(canvas: &mut Canvas<Window>, font_list: &Vec<Font>, font_index: u8, x: u32, y: u32, text: &str) {
-    let current_font = &font_list[font_index as usize];
+pub fn draw_text(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, text: &str) {
+    let mut px = x;
 
-
+    for c in text.chars() {
+        draw_char(canvas, font, px, y, c as u8);
+        px += font.width;
+    }
 }

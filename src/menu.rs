@@ -52,5 +52,6 @@ pub fn update() {
 }
 
 pub fn draw(game_state: &GameState, canvas: &mut Canvas<Window>) {
+    draw_text(canvas, &game_state.fonts[0], 100, 100, "HELLO WORLD");
 
 }

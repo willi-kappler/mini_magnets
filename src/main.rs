@@ -7,6 +7,7 @@ use sdl2::pixels::Color;
 use sdl2::EventPump;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
+use sdl2::image::InitFlag;
 
 // Local modules
 mod game_state;
@@ -14,7 +15,6 @@ mod menu;
 mod draw_text;
 
 use game_state::{GameState, GameScreen};
-use menu::{MenuScreen};
 
 // Needed libraries:
 // apt install libsdl2-2.0-0 libsdl2-dev libsdl2-gfx-1.0-0 libsdl2-gfx-dev libsdl2-image-2.0-0 libsdl2-image-dev libsdl2-mixer-2.0-0 libsdl2-mixer-dev libsdl2-ttf-2.0-0 libsdl2-ttf-dev
@@ -38,14 +38,19 @@ pub fn main() {
  
     let mut canvas = window.into_canvas().accelerated().build().unwrap();
     // let mut canvas = window.into_canvas().build().unwrap();
+    let texture_creator = canvas.texture_creator();
  
+    // Activate support fot PNG and JPH image file format
+    let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG).unwrap();
+
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
     canvas.present();
 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut game_state = GameState::new();
+    let mut game_state = GameState::new(&texture_creator);
+    game_state.load_font("assets/font1.png", 32, 32);
 
     let mut instant = Instant::now();
 
