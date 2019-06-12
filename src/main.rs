@@ -11,6 +11,7 @@ use sdl2::video::Window;
 // Local modules
 mod game_state;
 mod menu;
+mod draw_text;
 
 use game_state::{GameState, GameScreen};
 use menu::{MenuScreen};
@@ -35,7 +36,8 @@ pub fn main() {
         .build()
         .unwrap();
  
-    let mut canvas = window.into_canvas().build().unwrap();
+    let mut canvas = window.into_canvas().accelerated().build().unwrap();
+    // let mut canvas = window.into_canvas().build().unwrap();
  
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
@@ -51,7 +53,7 @@ pub fn main() {
         process(&mut game_state, &mut event_pump);
 
         update(&mut game_state);
-        
+
         draw(&mut game_state, &mut canvas);
 
         game_state.sleep_time = game_state.frame_duration - (instant.elapsed().as_millis() as i64);

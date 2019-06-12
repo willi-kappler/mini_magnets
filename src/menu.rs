@@ -7,6 +7,7 @@ use sdl2::keyboard::Keycode;
 
 // Local modules
 use crate::game_state::{GameState};
+use crate::draw_text::{draw_text};
 
 pub struct MenuState {
     menu_screen: MenuScreen,
