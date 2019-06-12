@@ -13,6 +13,7 @@ mod game_state;
 mod menu;
 
 use game_state::{GameState, GameScreen};
+use menu::{MenuScreen};
 
 // Needed libraries:
 // apt install libsdl2-2.0-0 libsdl2-dev libsdl2-gfx-1.0-0 libsdl2-gfx-dev libsdl2-image-2.0-0 libsdl2-image-dev libsdl2-mixer-2.0-0 libsdl2-mixer-dev libsdl2-ttf-2.0-0 libsdl2-ttf-dev
@@ -42,18 +43,15 @@ pub fn main() {
 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut game_state = GameState {
-        quit: false,
-        game_screen: GameScreen::Menu,
-        sleep_time: 0,
-        frame_duration: 16,
-    };
+    let mut game_state = GameState::new();
 
     let mut instant = Instant::now();
 
     while !game_state.quit {
         process(&mut game_state, &mut event_pump);
+
         update(&mut game_state);
+        
         draw(&mut game_state, &mut canvas);
 
         game_state.sleep_time = game_state.frame_duration - (instant.elapsed().as_millis() as i64);

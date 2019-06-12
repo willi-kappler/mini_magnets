@@ -8,6 +8,28 @@ use sdl2::keyboard::Keycode;
 // Local modules
 use crate::game_state::{GameState};
 
+pub struct MenuState {
+    menu_screen: MenuScreen,
+    selected_item: u8,
+}
+
+pub enum MenuScreen {
+    MainMenu,
+    AudioMenu,
+    GraphicMenu,
+    ControllerMenu,
+    HighScore,
+}
+
+impl MenuState {
+    pub fn new() -> MenuState {
+        MenuState {
+            menu_screen: MenuScreen::MainMenu,
+            selected_item: 0,
+        }
+    }
+}
+
 pub fn process(game_state: &mut GameState, event_pump: &mut EventPump) {
     for event in event_pump.poll_iter() {
         match event {
