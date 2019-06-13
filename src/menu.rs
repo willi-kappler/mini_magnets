@@ -7,7 +7,7 @@ use sdl2::keyboard::Keycode;
 
 // Local modules
 use crate::game_state::{GameState};
-use crate::draw_text::{draw_text};
+use crate::draw_text::{draw_text, draw_text_centered};
 
 pub struct MenuState {
     menu_screen: MenuScreen,
@@ -52,8 +52,15 @@ pub fn update() {
 }
 
 pub fn draw(game_state: &GameState, canvas: &mut Canvas<Window>) {
-    draw_text(canvas, &game_state.fonts[0], 100, 100, "HELLO WORLD");
-    let fps_string = format!("FPS: {:2.2}", 1000.0 / (game_state.sleep_time as f64));
-    draw_text(canvas, &game_state.fonts[0], 100, 200, &fps_string);
+    draw_text(canvas, &game_state.fonts[0], 100, 50, "HELLO WORLD");
+    let fps_string = format!("FPS: {:2.2}", 1000.0 / (game_state.elapsed as f64));
+    draw_text(canvas, &game_state.fonts[0], 100, 100, &fps_string);
+
+    draw_text_centered(canvas, &game_state.fonts[0], 400, 150, "MAIN MENU");
+    draw_text_centered(canvas, &game_state.fonts[0], 400, 200, "START");
+    draw_text_centered(canvas, &game_state.fonts[0], 400, 250, "AUDIO OPTIONS");
+    draw_text_centered(canvas, &game_state.fonts[0], 400, 300, "GFX OPTIONS");
+    draw_text_centered(canvas, &game_state.fonts[0], 400, 350, "HIGH SCORE");
+    draw_text_centered(canvas, &game_state.fonts[0], 400, 400, "EXIT");
 
 }

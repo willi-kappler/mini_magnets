@@ -81,3 +81,9 @@ pub fn draw_text(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, text:
         px += font.width;
     }
 }
+
+pub fn draw_text_centered(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, text: &str) {
+    let len = text.len() as u32;
+    let x2 = x - ((len * font.width) / 2);
+    draw_text(canvas, font, x2, y, text);
+}

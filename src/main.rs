@@ -53,6 +53,7 @@ pub fn main() {
     game_state.load_font("assets/font1.png", 32, 32);
 
     let mut instant = Instant::now();
+    let mut sleep_time = 0;
 
     while !game_state.quit {
         process(&mut game_state, &mut event_pump);
@@ -61,9 +62,10 @@ pub fn main() {
 
         draw(&mut game_state, &mut canvas);
 
-        game_state.sleep_time = game_state.frame_duration - (instant.elapsed().as_millis() as i64);
-        if game_state.sleep_time > 0 {
-            thread::sleep(Duration::from_millis(game_state.sleep_time as u64))
+        game_state.elapsed = instant.elapsed().as_millis() as i64;
+        sleep_time = game_state.frame_duration - game_state.elapsed;
+        if sleep_time > 0 {
+            thread::sleep(Duration::from_millis(sleep_time as u64))
         }
         instant = Instant::now();
     }
