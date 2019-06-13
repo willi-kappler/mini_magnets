@@ -53,5 +53,7 @@ pub fn update() {
 
 pub fn draw(game_state: &GameState, canvas: &mut Canvas<Window>) {
     draw_text(canvas, &game_state.fonts[0], 100, 100, "HELLO WORLD");
+    let fps_string = format!("FPS: {:2.2}", 1000.0 / (game_state.sleep_time as f64));
+    draw_text(canvas, &game_state.fonts[0], 100, 200, &fps_string);
 
 }
