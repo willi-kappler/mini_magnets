@@ -7,7 +7,7 @@ use sdl2::keyboard::Keycode;
 
 // Local modules
 use crate::game_state::{GameState};
-use crate::draw_text::{draw_text, draw_text_centered};
+use crate::draw_text::{draw_text, draw_text_centered, Font};
 
 pub struct MenuState {
     menu_screen: MenuScreen,
@@ -52,15 +52,41 @@ pub fn update() {
 }
 
 pub fn draw(game_state: &GameState, canvas: &mut Canvas<Window>) {
-    draw_text(canvas, &game_state.fonts[0], 100, 50, "HELLO WORLD");
+    let font = &game_state.fonts[0];
+    draw_text(canvas, font, 100, 50, "HELLO WORLD");
     let fps_string = format!("FPS: {:2.2}", 1000.0 / (game_state.elapsed as f64));
-    draw_text(canvas, &game_state.fonts[0], 100, 100, &fps_string);
+    draw_text(canvas, font, 100, 100, &fps_string);
 
-    draw_text_centered(canvas, &game_state.fonts[0], 400, 150, "MAIN MENU");
-    draw_text_centered(canvas, &game_state.fonts[0], 400, 200, "START");
-    draw_text_centered(canvas, &game_state.fonts[0], 400, 250, "AUDIO OPTIONS");
-    draw_text_centered(canvas, &game_state.fonts[0], 400, 300, "GFX OPTIONS");
-    draw_text_centered(canvas, &game_state.fonts[0], 400, 350, "HIGH SCORE");
-    draw_text_centered(canvas, &game_state.fonts[0], 400, 400, "EXIT");
+    let menu_screen = &game_state.menu_state.menu_screen;
+    let selected_item = game_state.menu_state.selected_item;
 
+    match menu_screen {
+        MenuScreen::MainMenu => {
+            let menu = vec!["MAIN MENU", "START", "AUDIO OPTIONS", "GFX OPTIONS", "HIGH SCORE", "EXIT"];
+            draw_menu(canvas, font, 400, 150, 50, menu);
+        },
+        MenuScreen::AudioMenu => {
+            let menu = vec!["AUDIO MENU", "SFX VOLUME", "GFX VOLUME", "BACK"];
+            draw_menu(canvas, font, 400, 150, 50, menu);
+        },
+        MenuScreen::GraphicMenu => {
+            let menu = vec!["GFX MENU", "SCREEN SIZE", "GAMMA CORRECTION", "BACK"];
+            draw_menu(canvas, font, 400, 150, 50, menu);
+        },
+        MenuScreen::ControllerMenu => {
+            let menu = vec!["CONTROLLER MENU", "UP", "DOWN", "LEFT", "RIGHT", "BACK"];
+            draw_menu(canvas, font, 400, 150, 50, menu);
+        },
+        MenuScreen::HighScore => {
+
+        },
+    }
+}
+
+fn draw_menu(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, step: u32, texts: Vec<&str>) {
+    let mut py = y;
+    for line in texts {
+        draw_text_centered(canvas, font, x, py, line);
+        py += step;
+    }
 }
