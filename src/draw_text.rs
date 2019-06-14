@@ -32,26 +32,12 @@ pub struct Font<'a> {
 // 95 _
 
 pub fn draw_char(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, c: u8) {
-    let index: u8;
-
-    match c {
-        32 => {
-            // Nothing to do
-            return
-        },
-        48..=57 => {
-            // Number
-            index = c - 48;
-        },
-        65..=90 => {
-            // Alphabetic character
-            index = c - 55;
-        }
-        _ => {
-            // Not supported character
-            return
-        },
+    if c < 32 || c > 95 {
+        // Outside of character range
+        return
     }
+
+    let index = c - 32;
 
     let row = index / font.cols;
     let col = index - (row * font.cols);

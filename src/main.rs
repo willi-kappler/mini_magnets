@@ -13,6 +13,7 @@ use sdl2::image::InitFlag;
 mod game_state;
 mod menu;
 mod draw_text;
+mod text_fx;
 
 use game_state::{GameState, GameScreen};
 
@@ -40,7 +41,7 @@ pub fn main() {
     // let mut canvas = window.into_canvas().build().unwrap();
     let texture_creator = canvas.texture_creator();
  
-    // Activate support fot PNG and JPH image file format
+    // Activate support fot PNG and JPG image file format
     let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG).unwrap();
 
     canvas.set_draw_color(Color::RGB(0, 0, 0));
@@ -69,30 +70,6 @@ pub fn main() {
         }
         instant = Instant::now();
     }
-
-    /*
-    let mut i = 0;
-
-    'running: loop {
-        i = (i + 1) % 255;
-        canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
-        canvas.clear();
-
-        for event in event_pump.poll_iter() {
-            match event {
-                Event::Quit {..} |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    break 'running
-                },
-                _ => {}
-            }
-        }
-        // The rest of the game loop goes here...
-
-        canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
-    }
-    */
 }
 
 fn process(game_state: &mut GameState, event_pump: &mut EventPump) {
