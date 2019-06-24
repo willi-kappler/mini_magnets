@@ -4,7 +4,7 @@ use sdl2::video::Window;
 use sdl2::rect::Rect;
 use sdl2::render::Texture;
 
-pub struct Font<'a> {
+pub struct Font {
     // Width of a single character
     pub width: u32,
     // Height of a single character
@@ -14,7 +14,7 @@ pub struct Font<'a> {
     // Number of cols in font atlas
     pub cols: u8,
     // The actual image containing the font pixel data
-    pub texture: Texture<'a>,
+    pub texture: Texture,
 }
 
 // ASCII table:
