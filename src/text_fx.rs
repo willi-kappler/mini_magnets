@@ -77,3 +77,6 @@ impl FXSineWave {
 
 impl TextFX for FXSineWave {
 }
+
+// &dyn Trait, &mut dyn Trait, and Box<dyn Trait>
+// https://joshleeb.com/posts/rust-traits-and-trait-objects/
