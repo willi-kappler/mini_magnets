@@ -1,5 +1,4 @@
 // External modules
-use sdl2::EventPump;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2::event::Event;
@@ -9,11 +8,13 @@ use sdl2::keyboard::Keycode;
 use crate::game_state::{GameState};
 use crate::draw_text::{draw_text, draw_text_centered, Font};
 
+#[derive(Debug)]
 pub struct MenuState {
     menu_screen: MenuScreen,
     selected_item: u8,
 }
 
+#[derive(Debug)]
 pub enum MenuScreen {
     MainMenu,
     AudioMenu,
@@ -31,8 +32,8 @@ impl MenuState {
     }
 }
 
-pub fn process(game_state: &mut GameState, event_pump: &mut EventPump) {
-    for event in event_pump.poll_iter() {
+pub fn process(game_state: &mut GameState) {
+    for event in game_state.event_pump.poll_iter() {
         match event {
             Event::Quit {..} => {
                 // User closed main window
@@ -47,15 +48,17 @@ pub fn process(game_state: &mut GameState, event_pump: &mut EventPump) {
     }
 }
 
-pub fn update() {
+pub fn update(game_state: &mut GameState) {
 
 }
 
-pub fn draw(game_state: &GameState, canvas: &mut Canvas<Window>) {
+pub fn draw(game_state: &mut GameState) {
     let font = &game_state.fonts[0];
-    draw_text(canvas, font, 100, 50, "HELLO WORLD");
+    let mut canvas = &mut game_state.canvas;
+
+    draw_text(&mut canvas, font, 100, 50, "HELLO WORLD");
     let fps_string = format!("FPS: {:2.2}", 1000.0 / (game_state.elapsed as f64));
-    draw_text(canvas, font, 100, 100, &fps_string);
+    draw_text(&mut canvas, font, 100, 100, &fps_string);
 
     let menu_screen = &game_state.menu_state.menu_screen;
     let selected_item = game_state.menu_state.selected_item;
@@ -63,19 +66,19 @@ pub fn draw(game_state: &GameState, canvas: &mut Canvas<Window>) {
     match menu_screen {
         MenuScreen::MainMenu => {
             let menu = vec!["MAIN MENU", "START", "AUDIO OPTIONS", "GFX OPTIONS", "HIGH SCORE", "EXIT"];
-            draw_menu(canvas, font, 400, 150, 50, menu);
+            draw_menu(&mut canvas, font, 400, 150, 50, menu);
         },
         MenuScreen::AudioMenu => {
             let menu = vec!["AUDIO MENU", "SFX VOLUME", "GFX VOLUME", "BACK"];
-            draw_menu(canvas, font, 400, 150, 50, menu);
+            draw_menu(&mut canvas, font, 400, 150, 50, menu);
         },
         MenuScreen::GraphicMenu => {
             let menu = vec!["GFX MENU", "SCREEN SIZE", "GAMMA CORRECTION", "BACK"];
-            draw_menu(canvas, font, 400, 150, 50, menu);
+            draw_menu(&mut canvas, font, 400, 150, 50, menu);
         },
         MenuScreen::ControllerMenu => {
             let menu = vec!["CONTROLLER MENU", "UP", "DOWN", "LEFT", "RIGHT", "BACK"];
-            draw_menu(canvas, font, 400, 150, 50, menu);
+            draw_menu(&mut canvas, font, 400, 150, 50, menu);
         },
         MenuScreen::HighScore => {
 

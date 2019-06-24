@@ -1,13 +1,13 @@
 // Rust modules
-use std::rc::Rc;
+// use std::rc::Rc;
 
 // External modules
-use sdl2::render::Canvas;
-use sdl2::video::Window;
-use sdl2::rect::Rect;
+// use sdl2::render::Canvas;
+// use sdl2::video::Window;
+// use sdl2::rect::Rect;
 use sdl2::render::Texture;
 
-pub struct Font2<'a> {
+pub struct Font2 {
     // Width of a single character
     pub width: u32,
     // Height of a single character
@@ -17,7 +17,7 @@ pub struct Font2<'a> {
     // Number of cols in font atlas
     pub cols: u8,
     // The actual image containing the font pixel data
-    pub texture: Texture<'a>,
+    pub texture: Texture,
 }
 
 pub trait TextFX {
@@ -37,6 +37,7 @@ pub trait TextFX {
     }
 }
 
+#[derive(Debug)]
 pub struct FXStatic {
     //font: Rc<Font2>,
     //canvas: Canvas,
@@ -59,6 +60,7 @@ impl TextFX for FXStatic {
 
 }
 
+#[derive(Debug)]
 pub struct FXSineWave {
     phase: f32,
     amplitude: f32,
@@ -76,4 +78,5 @@ impl FXSineWave {
 }
 
 impl TextFX for FXSineWave {
+
 }
