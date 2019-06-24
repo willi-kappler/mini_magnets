@@ -65,7 +65,7 @@ impl GameState {
     }
 
     fn load_resources(&mut self) {
-        self.load_font("assets/font1.png", 32, 32);
+        self.load_font("assets/font2.png", 24, 24);
 
     }
 
