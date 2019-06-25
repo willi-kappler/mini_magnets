@@ -14,15 +14,47 @@ pub struct MenuItems {
 
 pub fn new_menu_items() -> MenuItems {
     MenuItems {
-        selected_item: 0,
+        selected_item: 1,
     }
 }
 
-pub fn process_main_menu(event: Event, quit: &mut bool) {
+pub fn process_main_menu(event: Event, quit: &mut bool, menu_items: &mut MenuItems) {
     match event {
-        Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-            // User pressed ESC in main menu
-            *quit = true;
+        Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
+            if menu_items.selected_item > 1 {
+                menu_items.selected_item -= 1;
+            }
+        },
+        Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
+            if menu_items.selected_item < 6 {
+                menu_items.selected_item += 1;
+            }
+        },
+        Event::KeyDown { keycode: Some(Keycode::Return), .. } => {
+            match menu_items.selected_item {
+                1 => {
+                    // Start game
+                },
+                2 => {
+                    // Audio options
+                },
+                3 => {
+                    // GFX options
+                },
+                4 => {
+                    // Controls
+                },
+                5 => {
+                    // High Score
+                },
+                6 => {
+                    // Exit
+                    *quit = true;
+                }
+                _ => {
+                    unreachable!();
+                }
+            }
         },
         _ => {}
     }
@@ -41,13 +73,18 @@ pub fn draw_main_menu(canvas: &mut Canvas<Window>, fonts: &Vec<Font>, elapsed: i
     draw_text(canvas, font, 400, 0, &elapsed_string);
 
     let menu = vec!["MAIN MENU", "START", "AUDIO OPTIONS", "GFX OPTIONS", "CONTROLS", "HIGH SCORE", "EXIT"];
-    draw_menu(canvas, font, 400, 125, 30, menu);
+    draw_menu(canvas, font, 400, 125, 30, menu, menu_items.selected_item as usize);
 }
 
-fn draw_menu(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, step: u32, texts: Vec<&str>) {
+fn draw_menu(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, step: u32, texts: Vec<&str>, selected_item: usize) {
     let mut py = y;
-    for line in texts {
-        draw_text_centered(canvas, font, x, py, line);
+    for (i, line) in texts.iter().enumerate() {
+        if selected_item == i {
+            let line = format!("-> {} <-", line);
+            draw_text_centered(canvas, font, x, py, &line);
+        } else {
+            draw_text_centered(canvas, font, x, py, line);
+        }
         py += step;
     }
 }

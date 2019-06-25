@@ -6,7 +6,6 @@
 mod game;
 mod menu;
 mod draw_text;
-mod text_fx;
 
 use game::{new_game, run_game};
 

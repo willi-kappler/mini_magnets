@@ -92,7 +92,7 @@ fn process(game: &mut Game) {
             _ => {
                 match game.game_screen {
                     GameScreen::MainMenu => {
-                        menu::process_main_menu(event, &mut game.quit)
+                        menu::process_main_menu(event, &mut game.quit, &mut game.menu_items)
                     },
                 }
             }
