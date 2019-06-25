@@ -21,13 +21,15 @@ pub fn new_menu_items() -> MenuItems {
 pub fn process_main_menu(event: Event, quit: &mut bool, menu_items: &mut MenuItems) {
     match event {
         Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
-            if menu_items.selected_item > 1 {
-                menu_items.selected_item -= 1;
+            menu_items.selected_item -= 1;
+            if menu_items.selected_item == 0 {
+                menu_items.selected_item = 6;
             }
         },
         Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
-            if menu_items.selected_item < 6 {
-                menu_items.selected_item += 1;
+            menu_items.selected_item += 1;
+            if menu_items.selected_item == 7 {
+                menu_items.selected_item = 1;
             }
         },
         Event::KeyDown { keycode: Some(Keycode::Return), .. } => {
