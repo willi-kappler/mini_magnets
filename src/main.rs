@@ -3,12 +3,12 @@
 // External modules
 
 // Local modules
-mod game_state;
+mod game;
 mod menu;
 mod draw_text;
 mod text_fx;
 
-use game_state::{GameState};
+use game::{Game};
 
 // Needed libraries:
 // apt install libsdl2-2.0-0 libsdl2-dev libsdl2-gfx-1.0-0 libsdl2-gfx-dev libsdl2-image-2.0-0 libsdl2-image-dev libsdl2-mixer-2.0-0 libsdl2-mixer-dev libsdl2-ttf-2.0-0 libsdl2-ttf-dev
@@ -22,6 +22,6 @@ use game_state::{GameState};
 // http://www.informit.com/articles/article.aspx?p=2167437&seqNum=3
 
 pub fn main() {
-    let mut game_state = GameState::new();
-     game_state.run();
+    let mut game = Game::new();
+     game.run();
 }

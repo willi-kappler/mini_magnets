@@ -14,7 +14,7 @@ use sdl2::pixels::Color;
 use crate::menu;
 use crate::draw_text::{Font};
 
-pub struct GameState {
+pub struct Game {
     pub quit: bool,
     pub game_screen: GameScreen,
     pub menu_state: menu::MenuState,
@@ -27,8 +27,8 @@ pub struct GameState {
     pub fonts: Vec<Font>,
 }
 
-impl GameState {
-    pub fn new() -> GameState {
+impl Game {
+    pub fn new() -> Game {
         let sdl_context = sdl2::init().unwrap();
         let video_subsystem = sdl_context.video().unwrap();
     
@@ -50,7 +50,7 @@ impl GameState {
 
         let event_pump = sdl_context.event_pump().unwrap();
 
-        GameState {
+        Game {
             quit: false,
             game_screen: GameScreen::Menu,
             menu_state: menu::MenuState::new(),
