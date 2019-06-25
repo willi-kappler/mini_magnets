@@ -11,14 +11,12 @@ use sdl2::EventPump;
 use sdl2::pixels::Color;
 
 // Local modules
-use crate::menu::{MainMenu};
+use crate::menu;
 use crate::draw_text::{Font};
-use crate::game_screen::{GameScreen};
 
 pub struct Game {
     pub quit: bool,
-    game_screens: Vec<Box<dyn GameScreen>>,
-    current_screen: usize,
+    game_screen: GameScreen,
     game_settings: GameSettings,
     pub elapsed: i64,
     pub frame_duration: i64,
@@ -51,13 +49,9 @@ impl Game {
 
         let event_pump = sdl_context.event_pump().unwrap();
 
-        let mut game_screens = Vec::new();
-        game_screens.push(Box::new(MainMenu::new()) as Box<dyn GameScreen> );
-
         Game {
             quit: false,
-            game_screens: game_screens,
-            current_screen: 0,
+            game_screen: GameScreen::MainMenu,
             game_settings: GameSettings::new(),
             elapsed: 0,
             frame_duration: 16,
@@ -107,18 +101,30 @@ impl Game {
     }
 
     fn process(&mut self) {
-        self.game_screens[self.current_screen].process(self)
+        match self.game_screen {
+            GameScreen::MainMenu => {
+                menu::process_main_menu(self)
+            },
+        }
     }
 
     fn update(&mut self) {
-        self.game_screens[self.current_screen].update(self)
+        match self.game_screen {
+            GameScreen::MainMenu => {
+                menu::update_main_menu(self)
+            },
+        }
     }
 
     fn draw(&mut self) {
         self.canvas.set_draw_color(Color::RGB(0, 0, 0));
         self.canvas.clear();
 
-        self.game_screens[self.current_screen].draw(self);
+        match self.game_screen {
+            GameScreen::MainMenu => {
+                menu::draw_main_menu(self)
+            },
+        }
 
         self.canvas.present();
     }
@@ -141,4 +147,10 @@ impl GameSettings {
             fullscreen: false,
         }
     }
+}
+
+#[derive(Debug)]
+pub enum GameScreen {
+    MainMenu,
+
 }
