@@ -4,6 +4,7 @@
 
 // Local modules
 mod game;
+mod game_screen;
 mod menu;
 mod draw_text;
 mod text_fx;

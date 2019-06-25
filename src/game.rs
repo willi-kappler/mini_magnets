@@ -11,19 +11,20 @@ use sdl2::EventPump;
 use sdl2::pixels::Color;
 
 // Local modules
-use crate::menu;
+use crate::menu::{MainMenu};
 use crate::draw_text::{Font};
+use crate::game_screen::{GameScreen};
 
 pub struct Game {
     pub quit: bool,
-    pub game_screen: GameScreen,
-    pub menu_state: menu::MenuState,
-    pub game_settings: GameSettings,
+    game_screens: Vec<Box<dyn GameScreen>>,
+    current_screen: usize,
+    game_settings: GameSettings,
     pub elapsed: i64,
     pub frame_duration: i64,
     pub canvas: Canvas<Window>,
     pub event_pump: EventPump,
-    pub texture_creator: TextureCreator<WindowContext>,
+    texture_creator: TextureCreator<WindowContext>,
     pub fonts: Vec<Font>,
 }
 
@@ -50,10 +51,13 @@ impl Game {
 
         let event_pump = sdl_context.event_pump().unwrap();
 
+        let mut game_screens = Vec::new();
+        game_screens.push(Box::new(MainMenu::new()) as Box<dyn GameScreen> );
+
         Game {
             quit: false,
-            game_screen: GameScreen::Menu,
-            menu_state: menu::MenuState::new(),
+            game_screens: game_screens,
+            current_screen: 0,
             game_settings: GameSettings::new(),
             elapsed: 0,
             frame_duration: 16,
@@ -103,52 +107,21 @@ impl Game {
     }
 
     fn process(&mut self) {
-        match self.game_screen {
-            GameScreen::Menu => {
-                menu::process(self);
-            },
-            _ => {
-
-            }
-        }
+        self.game_screens[self.current_screen].process(self)
     }
 
     fn update(&mut self) {
-        match self.game_screen {
-            GameScreen::Menu => {
-                menu::update(self);
-            },
-            _ => {
-                
-            }
-        }
+        self.game_screens[self.current_screen].update(self)
     }
 
     fn draw(&mut self) {
         self.canvas.set_draw_color(Color::RGB(0, 0, 0));
         self.canvas.clear();
 
-        match self.game_screen {
-            GameScreen::Menu => {
-                menu::draw(self);
-            },
-            _ => {
-                
-            }
-        }
+        self.game_screens[self.current_screen].draw(self);
 
         self.canvas.present();
     }
-}
-
-#[derive(Debug)]
-pub enum GameScreen {
-    Menu,
-    Game,
-    NextLevel,
-    Pause,
-    GameOver,
-    QuitConfirm,
 }
 
 #[derive(Debug)]
