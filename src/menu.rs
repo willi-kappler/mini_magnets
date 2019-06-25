@@ -58,7 +58,9 @@ pub fn draw(game_state: &mut GameState) {
 
     draw_text(&mut canvas, font, 100, 50, "HELLO WORLD");
     let fps_string = format!("FPS: {:2.2}", 1000.0 / (game_state.elapsed as f64));
-    draw_text(&mut canvas, font, 100, 100, &fps_string);
+    draw_text(&mut canvas, font, 100, 74, &fps_string);
+    let time_string = format!("ELAPSED TIME: {}", game_state.elapsed as f64);
+    draw_text(&mut canvas, font, 100, 98, &time_string);
 
     let menu_screen = &game_state.menu_state.menu_screen;
     let selected_item = game_state.menu_state.selected_item;
