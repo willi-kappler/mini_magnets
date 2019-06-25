@@ -20,6 +20,11 @@ use game::{new_game, run_game};
 // https://www.reddit.com/r/pcmasterrace/comments/29qcqr/an_explanation_of_game_loops_fps_and_delta_time/
 // http://www.informit.com/articles/article.aspx?p=2167437&seqNum=3
 
+// Key Codes:
+// https://rust-sdl2.github.io/rust-sdl2/sdl2/keyboard/enum.Keycode.html
+
+
+
 pub fn main() {
     let mut mini_magnets = new_game();
      run_game(&mut mini_magnets);
