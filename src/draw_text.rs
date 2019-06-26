@@ -59,49 +59,84 @@ fn center_text(text: &str, x: u32, font: &Font) -> u32 {
 }
 
 pub struct StaticText {
-    pub x: u32,
-    pub y: u32,
-    pub text: String,
+    x: u32,
+    y: u32,
+    text: String,
+    // TODO: Add  Font
 }
 
-pub new_static_text(x: u32, y: u32, text: &str) -> StaticText {
-    StaticText {
-        x,
-        y,
-        text: text.to_string(),
+impl StaticText {
+    pub fn new(x: u32, y: u32, text: &str) -> StaticText {
+        StaticText {
+            x,
+            y,
+            text: text.to_string(),
+        }
     }
-}
 
-pub fn draw_static_text(canvas: &mut Canvas<Window>, font: &Font, text: &StaticText) {
-    let mut x2 = text.x;
-
-    for c in text.text.chars() {
-        draw_char(canvas, font, x2, text.y, c as u8);
-        x2 += font.width;
+    pub fn center(&mut self, font: &Font) {
+        self.x = center_text(&self.text, self.x, font);
     }
-}
 
-pub fn center_static_text(text: &mut StaticText, font: &Font) {
-    text.x = center_text(&text.text, text.x, font);
+    pub fn draw(&self, canvas: &mut Canvas<Window>, font: &Font) {
+        let mut x2 = text.x;
+
+        for c in text.text.chars() {
+            draw_char(canvas, font, x2, text.y, c as u8);
+            x2 += font.width;
+        }
+    }
+
+    pub set_text(&mut self, new_text: &str) {
+        self.text = new_text.to_string();
+    }
+
+    // TODO: pub fn chars() -> impl Iterator {}
 }
 
 pub struct WaveText {
-    pub text: StaticText,
-    pub amplitude: f64,
-    pub phase: f64,
-    pub speed: f64,
+    text: StaticText,
+    amplitude: f64,
+    phase: f64,
+    speed: f64,
+    active: bool,
 }
 
-pub fn draw_wave_text(canvas: &mut Canvas<Window>, font: &Font, text: &mut WaveText) {
-    let mut x2 = x;
-    let mut y2 = y;
-    let mut phase: wave.phase;
+impl WaveText {
+    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, text: &str) -> WaveText {
+        WaveText {
+            text: StaticText::new(x, y, text),
+            amplitude,
+            phase: 0.0,
+            speed,
+            active: true,
+        }
+    }
 
-    for c in text.chars() {
-        draw_char(canvas, font, x2, y2, c as u8);
-        x2 += font.width;
-        y2 = y + ((wave.amplitude * phase.sin()) as u32);
-        phase = phase + wave.speed;
+    pub fn center(&mut self, font: &Font) {
+        self.text.center(font);
+    }
+
+    pub draw(&self, canvas: &mut Canvas<Window>, font: &Font) {
+        if self.active {
+            let mut x2 = x;
+            let mut y2 = y;
+            let mut phase: self.phase;
+
+            for c in self.text.text.chars() {
+                y2 = y + ((self.amplitude * phase.sin()) as u32);
+                draw_char(canvas, font, x2, y2, c as u8);
+                x2 += font.width;
+                phase = phase + self.speed;
+            }
+        } else {
+            self.text.draw(canvas, font);
+        }
     }
 }
 
+pub struct SelectableText {
+    text: StaticText,
+    active: bool,
+    // TODO
+}

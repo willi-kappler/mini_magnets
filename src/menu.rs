@@ -6,15 +6,94 @@ use sdl2::keyboard::Keycode;
 
 // Local modules
 use crate::game::{Game};
-use crate::draw_text::{draw_text, draw_text_centered, Font};
+use crate::draw_text::{StaticText, WaveText};
 
-pub struct MenuItems {
+#[derive(Debug)]
+pub struct MenuItem {
+    num_of_items: u8,
     selected_item: u8,
 }
 
-pub fn new_menu_items() -> MenuItems {
-    MenuItems {
+impl MenuItem {
+    pub fn new(num_of_items: u8) -> MenuItems {
+        num_of_items,
         selected_item: 1,
+    }
+
+    pub up(&mut self) {
+        self.selected_item -= 1;
+        if self.selected_item == 0 {
+            self.selected_item = self.num_of_items;
+        }
+    }
+
+    pub down(&mut self) {
+        self.selected_item += 1;
+        if self.selected_item > self.num_of_items {
+            self.selected_item = 1;
+        }
+    }
+}
+
+struct BaseMenu {
+    menu_item: MenuItem,
+}
+
+impl BaseMenu {
+    fn new(num_of_items: u8) -> BaseMenu {
+        BaseMenu {
+            menu_item: MenuItem::new(num_of_items),
+        }
+    }
+
+    fn process(&mut self, event: &Event) -> {
+        match event {
+            Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
+                self.menu_item.up();
+            },
+            Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
+                self.menu_item.down();
+            },
+            _ => {}
+        }
+    }
+
+}
+
+pub struct MainMenu {
+    base_menu: BaseMenu,
+    title: WaveText,
+    fps: StaticText,
+    menu_texts: Vec<StaticText>,
+}
+
+impl MainMenu {
+    pub fn new() -> MainMenu {
+        MainMenu {
+            base_menu: BaseMenu::new(6),
+            title: WaveText::new(300, 125, 10.0, 0.1, "MAIN MENU"),
+            fps: StaticText::new(0, 575, "FPS"),
+            menu_texts: vec![
+                StaticText::new(300, 150, "START"),
+                StaticText::new(300, 175, "AUDIO OPTIONS"),
+                StaticText::new(300, 200, "GFX OPTIONS"),
+                StaticText::new(300, 225, "CONTROLS"),
+                StaticText::new(300, 250, "HIGH SCORE"),
+                StaticText::new(300, 275, "EXIT"),
+            ],
+        }
+    }
+
+    pub fn process(&mut self, event: &Event) {
+
+    }
+
+    pub fn update(&mut self) {
+
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas<Window>, fonts: &Vec<Font>) {
+
     }
 }
 
