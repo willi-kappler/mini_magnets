@@ -1,3 +1,6 @@
+// Rust modules
+use core::f64::consts::PI;
+
 // External modules
 use sdl2::render::Canvas;
 use sdl2::video::Window;
@@ -31,7 +34,7 @@ pub struct Font {
 // 91 [             92 \        93 ]        94 ^
 // 95 _
 
-pub fn draw_char(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, c: u8) {
+fn draw_char(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, c: u8) {
     if c < 32 || c > 95 {
         // Outside of character range
         return
@@ -50,17 +53,55 @@ pub fn draw_char(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, c: u8
     canvas.copy(&font.texture, Some(source), Some(destination)).unwrap();
 }
 
-pub fn draw_text(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, text: &str) {
-    let mut px = x;
+fn center_text(text: &str, x: u32, font: &Font) -> u32 {
+    let len = text.len() as u32;
+    x - ((len * font.width) / 2)
+}
 
-    for c in text.chars() {
-        draw_char(canvas, font, px, y, c as u8);
-        px += font.width;
+pub struct StaticText {
+    pub x: u32,
+    pub y: u32,
+    pub text: String,
+}
+
+pub new_static_text(x: u32, y: u32, text: &str) -> StaticText {
+    StaticText {
+        x,
+        y,
+        text: text.to_string(),
     }
 }
 
-pub fn draw_text_centered(canvas: &mut Canvas<Window>, font: &Font, x: u32, y: u32, text: &str) {
-    let len = text.len() as u32;
-    let x2 = x - ((len * font.width) / 2);
-    draw_text(canvas, font, x2, y, text);
+pub fn draw_static_text(canvas: &mut Canvas<Window>, font: &Font, text: &StaticText) {
+    let mut x2 = text.x;
+
+    for c in text.text.chars() {
+        draw_char(canvas, font, x2, text.y, c as u8);
+        x2 += font.width;
+    }
 }
+
+pub fn center_static_text(text: &mut StaticText, font: &Font) {
+    text.x = center_text(&text.text, text.x, font);
+}
+
+pub struct WaveText {
+    pub text: StaticText,
+    pub amplitude: f64,
+    pub phase: f64,
+    pub speed: f64,
+}
+
+pub fn draw_wave_text(canvas: &mut Canvas<Window>, font: &Font, text: &mut WaveText) {
+    let mut x2 = x;
+    let mut y2 = y;
+    let mut phase: wave.phase;
+
+    for c in text.chars() {
+        draw_char(canvas, font, x2, y2, c as u8);
+        x2 += font.width;
+        y2 = y + ((wave.amplitude * phase.sin()) as u32);
+        phase = phase + wave.speed;
+    }
+}
+
