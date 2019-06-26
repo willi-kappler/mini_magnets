@@ -12,14 +12,14 @@ use sdl2::event::Event;
 use sdl2::pixels::Color;
 
 // Local modules
-use crate::menu;
+use crate::menu::{MainMenu};
 use crate::draw_text::{Font};
 
 pub struct Game {
     pub quit: bool,
     pub game_screen: GameScreen,
     pub game_settings: GameSettings,
-    pub menu_items: menu::MenuItems,
+    pub main_menu: MainMenu,
     pub elapsed: i64,
     pub frame_duration: i64,
     pub canvas: Canvas<Window>,
@@ -54,7 +54,7 @@ pub fn new_game() -> Game {
         quit: false,
         game_screen: GameScreen::MainMenu,
         game_settings: new_settings(),
-        menu_items: menu::new_menu_items(),
+        main_menu: MainMenu::new(),
         elapsed: 0,
         frame_duration: 16,
         canvas: canvas,
@@ -92,7 +92,7 @@ fn process(game: &mut Game) {
             _ => {
                 match game.game_screen {
                     GameScreen::MainMenu => {
-                        menu::process_main_menu(event, &mut game.quit, &mut game.menu_items)
+                        game.main_menu.process(&event, &mut game.quit);
                     },
                 }
             }
@@ -103,7 +103,7 @@ fn process(game: &mut Game) {
 fn update(game: &mut Game) {
     match game.game_screen {
         GameScreen::MainMenu => {
-            menu::update_main_menu(&mut game.menu_items)
+            game.main_menu.update(game.elapsed);
         },
     }
 }
@@ -114,7 +114,7 @@ fn draw(game: &mut Game) {
 
     match game.game_screen {
         GameScreen::MainMenu => {
-            menu::draw_main_menu(&mut game.canvas, &game.fonts, game.elapsed, &game.menu_items)
+            game.main_menu.draw(&mut game.canvas, &game.fonts)
         },
     }
 

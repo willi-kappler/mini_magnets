@@ -7,6 +7,8 @@ use sdl2::video::Window;
 use sdl2::rect::Rect;
 use sdl2::render::Texture;
 
+const PI_2: f64 = 2.0 * PI;
+
 pub struct Font {
     // Width of a single character
     pub width: u32,
@@ -79,15 +81,15 @@ impl StaticText {
     }
 
     pub fn draw(&self, canvas: &mut Canvas<Window>, font: &Font) {
-        let mut x2 = text.x;
+        let mut x2 = self.x;
 
-        for c in text.text.chars() {
-            draw_char(canvas, font, x2, text.y, c as u8);
+        for c in self.text.chars() {
+            draw_char(canvas, font, x2, self.y, c as u8);
             x2 += font.width;
         }
     }
 
-    pub set_text(&mut self, new_text: &str) {
+    pub fn set_text(&mut self, new_text: &str) {
         self.text = new_text.to_string();
     }
 
@@ -99,16 +101,18 @@ pub struct WaveText {
     amplitude: f64,
     phase: f64,
     speed: f64,
+    shift: f64,
     active: bool,
 }
 
 impl WaveText {
-    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, text: &str) -> WaveText {
+    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, shift: f64, text: &str) -> WaveText {
         WaveText {
             text: StaticText::new(x, y, text),
             amplitude,
             phase: 0.0,
             speed,
+            shift,
             active: true,
         }
     }
@@ -117,17 +121,24 @@ impl WaveText {
         self.text.center(font);
     }
 
-    pub draw(&self, canvas: &mut Canvas<Window>, font: &Font) {
+    pub fn update(&mut self) {
+        self.phase += self.speed;
+        if self.phase > PI_2 {
+            self.phase -= PI_2;
+        }
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas<Window>, font: &Font) {
         if self.active {
-            let mut x2 = x;
-            let mut y2 = y;
-            let mut phase: self.phase;
+            let mut x2 = self.text.x;
+            let mut y2 = self.text.y;
+            let mut phase = self.phase;
 
             for c in self.text.text.chars() {
-                y2 = y + ((self.amplitude * phase.sin()) as u32);
+                y2 = self.text.y + ((self.amplitude * phase.sin()) as u32);
                 draw_char(canvas, font, x2, y2, c as u8);
                 x2 += font.width;
-                phase = phase + self.speed;
+                phase = phase + self.shift;
             }
         } else {
             self.text.draw(canvas, font);
