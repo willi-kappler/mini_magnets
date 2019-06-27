@@ -1,3 +1,8 @@
+
+// Rust modules
+use std::rc::Rc;
+
+
 // External modules
 use sdl2::render::Canvas;
 use sdl2::video::Window;
@@ -10,12 +15,12 @@ use crate::draw_text::{Font, StaticText, WaveText, SelectableText};
 
 #[derive(Debug)]
 pub struct MenuItem {
-    num_of_items: u8,
-    selected_item: u8,
+    num_of_items: usize,
+    selected_item: usize,
 }
 
 impl MenuItem {
-    pub fn new(num_of_items: u8) -> MenuItem {
+    pub fn new(num_of_items: usize) -> MenuItem {
         MenuItem {
             num_of_items,
             selected_item: 0,
@@ -44,7 +49,7 @@ struct BaseMenu {
 }
 
 impl BaseMenu {
-    fn new(num_of_items: u8) -> BaseMenu {
+    fn new(num_of_items: usize) -> BaseMenu {
         BaseMenu {
             menu_item: MenuItem::new(num_of_items),
         }
@@ -65,19 +70,19 @@ impl BaseMenu {
 }
 
 pub struct MainMenu {
-    base_menu: BaseMenu,
+    base: BaseMenu,
     title: WaveText,
     fps: StaticText,
-    menu_texts: Vec<SelectableText>,
+    menu_items: Vec<SelectableText>,
 }
 
 impl MainMenu {
     pub fn new() -> MainMenu {
         MainMenu {
-            base_menu: BaseMenu::new(6),
+            base: BaseMenu::new(6),
             title: WaveText::new(300, 100, 10.0, 0.1, 0.5, "MAIN MENU"),
             fps: StaticText::new(0, 575, "FPS"),
-            menu_texts: MainMenu::create_texts(300, 150, 30,
+            menu_items: MainMenu::create_texts(300, 150, 30,
                 vec!["START", "AUDIO OPTIONS", "GFX OPTIONS", "CONTROLS", "HIGH SCORE", "EXIT"]),
         }
     }
@@ -97,7 +102,7 @@ impl MainMenu {
     pub fn process(&mut self, event: &Event, quit: &mut bool) {
         match event {
             Event::KeyDown { keycode: Some(Keycode::Return), .. } => {
-                match self.base_menu.menu_item.selected_item {
+                match self.base.menu_item.selected_item {
                     1 => {
                         // Start game
                     },
@@ -123,7 +128,9 @@ impl MainMenu {
                 }
             },
             _ => {
-                self.base_menu.process(event);
+                self.menu_items[self.base.menu_item.selected_item].set_active(false);
+                self.base.process(event);
+                self.menu_items[self.base.menu_item.selected_item].set_active(true);
             }
         }
     }
@@ -133,16 +140,25 @@ impl MainMenu {
 
         let fps_string = format!("FPS: {}", fps);
         self.fps.set_text(&fps_string);
+
+        self.menu_items[self.base.menu_item.selected_item].update();
     }
 
-    pub fn draw(&self, canvas: &mut Canvas<Window>, fonts: &Vec<Font>) {
-        let font = &fonts[0];
+    pub fn draw(&self, canvas: &mut Canvas<Window>) {
+        self.title.draw(canvas);
+        self.fps.draw(canvas);
 
-        self.title.draw(canvas, font);
-        self.fps.draw(canvas, font);
+        for item in self.menu_items.iter() {
+            item.draw(canvas);
+        }
+    }
 
-        for item in self.menu_texts.iter() {
-            item.draw(canvas, font);
+    pub fn set_font(&mut self, font: Rc<Font>) {
+        self.title.set_font(Rc::clone(&font));
+        self.fps.set_font(Rc::clone(&font));
+
+        for item in self.menu_items.iter_mut() {
+            item.set_font(Rc::clone(&font));
         }
     }
 }

@@ -2,6 +2,7 @@
 use std::path::Path;
 use std::time::{Instant, Duration};
 use std::thread;
+use std::rc::Rc;
 
 // External modules
 use sdl2::render::{TextureCreator, Canvas};
@@ -25,7 +26,7 @@ pub struct Game {
     pub canvas: Canvas<Window>,
     pub event_pump: EventPump,
     texture_creator: TextureCreator<WindowContext>,
-    fonts: Vec<Font>,
+    fonts: Vec<Rc<Font>>,
 }
 
 impl Game {
@@ -116,7 +117,7 @@ impl Game {
 
         match self.game_screen {
             GameScreen::MainMenu => {
-                self.main_menu.draw(&mut self.canvas, &self.fonts)
+                self.main_menu.draw(&mut self.canvas)
             },
         }
 
@@ -130,19 +131,21 @@ impl Game {
 
     fn load_resources(&mut self) {
         self.load_font("assets/font2.png", 24, 24);
+
+        self.main_menu.set_font(Rc::clone(&self.fonts[0]));
     }
 
     fn load_font<T: AsRef<Path>>(&mut self, path: T, char_width: u32, char_height: u32) {
         let texture = self.texture_creator.load_texture(path).unwrap();
         let texture_properties = texture.query();
 
-        let font = Font {
+        let font = Rc::new(Font {
             width: char_width,
             height: char_height,
             rows: (texture_properties.height / char_height) as u8,
             cols: (texture_properties.width / char_width) as u8,
             texture: texture,
-        };
+        });
 
         self.fonts.push(font);
     }
