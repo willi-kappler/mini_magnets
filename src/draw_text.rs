@@ -86,15 +86,25 @@ impl StaticText {
         }
     }
 
-    pub fn draw(&self, canvas: &mut Canvas<Window>) {
+    fn draw_at(&self, x: u32, y: u32, canvas: &mut Canvas<Window>) {
         if let Some(font) = &self.font {
-            let mut x2 = self.x;
+            let mut x2 = x;
 
             for c in self.text.chars() {
-                font.draw_char(canvas, x2, self.y, c as u8);
+                font.draw_char(canvas, x2, y, c as u8);
                 x2 += font.width;
             }
         }
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas<Window>) {
+        self.draw_at(self.x, self.y, canvas);
+    }
+
+    pub fn draw_offset(&self, dx: i32, dy: i32, canvas: &mut Canvas<Window>) {
+        let newx = ((self.x as i32) + dx) as u32;
+        let newy = ((self.y as i32) + dy) as u32;
+        self.draw_at(newx, newy, canvas);
     }
 
     pub fn set_text(&mut self, new_text: &str) {
@@ -185,14 +195,26 @@ impl WaveText {
 
 pub struct SelectableText {
     base: StaticText,
+    left_marker: StaticText,
+    right_marker: StaticText,
     active: bool,
+    offset: u32,
+    max_offset: u32,
 }
 
 impl SelectableText {
-    pub fn new(x: u32, y: u32, text: &str) -> SelectableText {
+    pub fn new(x: u32, y: u32, max_offset: u32, text: &str) -> SelectableText {
+        let base = StaticText::new(x, y, text);
+        let left_marker = StaticText::new(0, y, "->");
+        let right_marker = StaticText::new(0, y, "<-");
+
         SelectableText {
-            base: StaticText::new(x, y, text),
+            base,
+            left_marker,
+            right_marker,
             active: false,
+            offset: 0,
+            max_offset,
         }
     }
 
@@ -204,18 +226,23 @@ impl SelectableText {
         self.base.draw(canvas);
 
         if self.active {
-
+            self.left_marker.draw_offset(-(self.offset as i32), 0, canvas);
+            self.right_marker.draw_offset((self.offset as i32), 0, canvas);
         }
     }
 
     pub fn update(&mut self) {
         if self.active {
-
+            self.offset += 1;
+            if self.offset >= self.max_offset {
+                self.offset = 0;
+            }
         }
     }
 
     pub fn set_text(&mut self, new_text: &str) {
         self.base.set_text(new_text);
+        self.update_marker_pos();
     }
 
     pub fn set_active(&mut self, active: bool) {
@@ -223,6 +250,14 @@ impl SelectableText {
     }
 
     pub fn set_font(&mut self, font: Rc<Font>) {
-        self.base.set_font(font);
+        self.base.set_font(Rc::clone(&font));
+        self.left_marker.set_font(Rc::clone(&font));
+        self.right_marker.set_font(Rc::clone(&font));
+        self.update_marker_pos();
+    }
+
+    fn update_marker_pos(&mut self) {
+        self.left_marker.x = self.base.x - self.left_marker.width - self.max_offset;
+        self.right_marker.x = self.base.x + self.base.width + self.max_offset;
     }
 }
