@@ -131,7 +131,7 @@ impl WaveText {
     pub fn draw(&self, canvas: &mut Canvas<Window>, font: &Font) {
         if self.active {
             let mut x2 = self.text.x;
-            let mut y2 = self.text.y;
+            let mut y2;
             let mut phase = self.phase;
 
             for c in self.text.text.chars() {

@@ -5,7 +5,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
 // Local modules
-use crate::game::{Game};
+// use crate::game::{Game};
 use crate::draw_text::{Font, StaticText, WaveText};
 
 #[derive(Debug)]
@@ -120,10 +120,10 @@ impl MainMenu {
         }
     }
 
-    pub fn update(&mut self, elapsed: i64) {
+    pub fn update(&mut self, fps: u32) {
         self.title.update();
 
-        let fps_string = format!("FPS: {:2.2}", 1000.0 / (elapsed as f64));
+        let fps_string = format!("FPS: {}", fps);
         self.fps.set_text(&fps_string);
     }
 
