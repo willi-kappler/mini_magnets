@@ -20,7 +20,6 @@ pub struct Game {
     game_screen: GameScreen,
     game_settings: GameSettings,
     main_menu: MainMenu,
-    elapsed: i64,
     frame_duration: i64,
     fps: u32,
     pub canvas: Canvas<Window>,
@@ -57,7 +56,6 @@ impl Game {
             game_screen: GameScreen::MainMenu,
             game_settings: GameSettings::new(),
             main_menu: MainMenu::new(),
-            elapsed: 0,
             frame_duration: 16,
             fps: 0,
             canvas: canvas,
@@ -77,14 +75,12 @@ impl Game {
             self.update();
             self.draw();
 
-            self.elapsed = instant.elapsed().as_millis() as i64;
-
-            self.calculate_fps_avg();
-
-            let sleep_time = self.frame_duration - self.elapsed;
+            let sleep_time = self.frame_duration - (instant.elapsed().as_millis() as i64);
             if sleep_time > 0 {
                 thread::sleep(Duration::from_millis(sleep_time as u64))
             }
+
+            self.calculate_fps(instant.elapsed().as_millis());
         }
     }
 
@@ -127,13 +123,8 @@ impl Game {
         self.canvas.present();
     }
 
-    fn calculate_fps_avg(&mut self) {
-        let fps = if self.elapsed > 0 {
-                1000.0 / (self.elapsed as f64)
-            } else {
-                1000.0
-            };
-
+    fn calculate_fps(&mut self, elapsed: u128) {
+        let fps = 1000.0 / (elapsed as f64);
         self.fps = (((self.fps as f64) + fps) / 2.0) as u32;
     }
 
