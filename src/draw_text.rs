@@ -61,6 +61,8 @@ impl Font {
 pub struct StaticText {
     x: u32,
     y: u32,
+    width: u32,
+    height: u32,
     text: String,
     font: Option<Rc<Font>>,
 }
@@ -70,6 +72,8 @@ impl StaticText {
         StaticText {
             x,
             y,
+            width: 0,
+            height: 0,
             text: text.to_string(),
             font: None,
         }
@@ -95,10 +99,19 @@ impl StaticText {
 
     pub fn set_text(&mut self, new_text: &str) {
         self.text = new_text.to_string();
+        self.adapt_width_and_height();
     }
 
     pub fn set_font(&mut self, font: Rc<Font>) {
         self.font = Some(font);
+        self.adapt_width_and_height();
+    }
+
+    fn adapt_width_and_height(&mut self) {
+        if let Some(font) = &self.font {
+            self.width = font.width * (self.text.len() as u32);
+            self.height = font.height;
+        }
     }
 
     // TODO: pub fn chars() -> impl Iterator {}
