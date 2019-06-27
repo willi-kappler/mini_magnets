@@ -128,9 +128,14 @@ impl MainMenu {
                 }
             },
             _ => {
-                self.menu_items[self.base.menu_item.selected_item].set_active(false);
+                let prev_selected = self.base.menu_item.selected_item;
                 self.base.process(event);
-                self.menu_items[self.base.menu_item.selected_item].set_active(true);
+                let new_selected = self.base.menu_item.selected_item;
+
+                if prev_selected != new_selected {
+                    self.menu_items[prev_selected].set_active(false);
+                    self.menu_items[new_selected].set_active(true);
+                }
             }
         }
     }
@@ -160,5 +165,7 @@ impl MainMenu {
         for item in self.menu_items.iter_mut() {
             item.set_font(Rc::clone(&font));
         }
+
+        // println!("rc font count: {}", Rc::strong_count(&font));
     }
 }
