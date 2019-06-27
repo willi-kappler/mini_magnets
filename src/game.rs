@@ -23,7 +23,6 @@ pub struct Game {
     elapsed: i64,
     frame_duration: i64,
     fps: u32,
-    fps_avg: Vec<f64>,
     pub canvas: Canvas<Window>,
     pub event_pump: EventPump,
     texture_creator: TextureCreator<WindowContext>,
@@ -61,7 +60,6 @@ impl Game {
             elapsed: 0,
             frame_duration: 16,
             fps: 0,
-            fps_avg: Vec::new(),
             canvas: canvas,
             event_pump: event_pump,
             texture_creator: texture_creator,
@@ -131,17 +129,12 @@ impl Game {
 
     fn calculate_fps_avg(&mut self) {
         let fps = if self.elapsed > 0 {
-            1000.0 / (self.elapsed as f64)
+                1000.0 / (self.elapsed as f64)
             } else {
                 1000.0
             };
 
-        self.fps_avg.push(fps);
-
-        if self.fps_avg.len() > 10 {
-            self.fps_avg.remove(0);
-            self.fps = (self.fps_avg.iter().sum::<f64>() / 10.0) as u32;
-        }
+        self.fps = (((self.fps as f64) + fps) / 2.0) as u32;
     }
 
     fn load_resources(&mut self) {
