@@ -6,7 +6,7 @@ use sdl2::keyboard::Keycode;
 
 // Local modules
 // use crate::game::{Game};
-use crate::draw_text::{Font, StaticText, WaveText};
+use crate::draw_text::{Font, StaticText, WaveText, SelectableText};
 
 #[derive(Debug)]
 pub struct MenuItem {
@@ -18,21 +18,23 @@ impl MenuItem {
     pub fn new(num_of_items: u8) -> MenuItem {
         MenuItem {
             num_of_items,
-            selected_item: 1,
+            selected_item: 0,
         }
     }
 
     pub fn up(&mut self) {
-        self.selected_item -= 1;
         if self.selected_item == 0 {
             self.selected_item = self.num_of_items;
+        } else {
+            self.selected_item -= 1;
         }
     }
 
     pub fn down(&mut self) {
-        self.selected_item += 1;
-        if self.selected_item > self.num_of_items {
-            self.selected_item = 1;
+        if self.selected_item == self.num_of_items - 1 {
+            self.selected_item = 0;
+        } else {
+            self.selected_item += 1;
         }
     }
 }
@@ -66,24 +68,30 @@ pub struct MainMenu {
     base_menu: BaseMenu,
     title: WaveText,
     fps: StaticText,
-    menu_texts: Vec<StaticText>,
+    menu_texts: Vec<SelectableText>,
 }
 
 impl MainMenu {
     pub fn new() -> MainMenu {
         MainMenu {
             base_menu: BaseMenu::new(6),
-            title: WaveText::new(300, 115, 10.0, 0.1, 0.5, "MAIN MENU"),
+            title: WaveText::new(300, 100, 10.0, 0.1, 0.5, "MAIN MENU"),
             fps: StaticText::new(0, 575, "FPS"),
-            menu_texts: vec![
-                StaticText::new(300, 150, "START"),
-                StaticText::new(300, 175, "AUDIO OPTIONS"),
-                StaticText::new(300, 200, "GFX OPTIONS"),
-                StaticText::new(300, 225, "CONTROLS"),
-                StaticText::new(300, 250, "HIGH SCORE"),
-                StaticText::new(300, 275, "EXIT"),
-            ],
+            menu_texts: MainMenu::create_texts(300, 150, 30,
+                vec!["START", "AUDIO OPTIONS", "GFX OPTIONS", "CONTROLS", "HIGH SCORE", "EXIT"]),
         }
+    }
+
+    fn create_texts(x: u32, y: u32, step: u32, texts: Vec<&str>) -> Vec<SelectableText> {
+        let mut y2 = y;
+        let mut result: Vec<SelectableText> = Vec::new();
+
+        for text in texts {
+            result.push(SelectableText::new(x, y2, text));
+            y2 += step;
+        }
+
+        result
     }
 
     pub fn process(&mut self, event: &Event, quit: &mut bool) {

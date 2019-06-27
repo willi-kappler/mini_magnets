@@ -122,9 +122,11 @@ impl WaveText {
     }
 
     pub fn update(&mut self) {
-        self.phase += self.speed;
-        if self.phase > PI_2 {
-            self.phase -= PI_2;
+        if self.active {
+            self.phase += self.speed;
+            if self.phase > PI_2 {
+                self.phase -= PI_2;
+            }
         }
     }
 
@@ -144,10 +146,52 @@ impl WaveText {
             self.text.draw(canvas, font);
         }
     }
+
+    pub fn set_text(&mut self, new_text: &str) {
+        self.text.set_text(new_text);
+    }
+
+    pub fn set_active(&mut self, active: bool) {
+        self.active = active;
+    }
 }
 
 pub struct SelectableText {
     text: StaticText,
     active: bool,
-    // TODO
+}
+
+impl SelectableText {
+    pub fn new(x: u32, y: u32, text: &str) -> SelectableText {
+        SelectableText {
+            text: StaticText::new(x, y, text),
+            active: false,
+        }
+    }
+
+    pub fn center(&mut self, font: &Font) {
+        self.text.center(font);
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas<Window>, font: &Font) {
+        self.text.draw(canvas, font);
+
+        if self.active {
+            
+        }
+    }
+
+    pub fn update(&mut self) {
+        if self.active {
+
+        }
+    }
+
+    pub fn set_text(&mut self, new_text: &str) {
+        self.text.set_text(new_text);
+    }
+
+    pub fn set_active(&mut self, active: bool) {
+        self.active = active;
+    }
 }
