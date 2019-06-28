@@ -80,8 +80,8 @@ impl MainMenu {
         self.fps.draw(canvas);
     }
 
-    pub fn set_font(&mut self, font: Rc<Font>) {
-        self.base.set_font(Rc::clone(&font));
-        self.fps.set_font(Rc::clone(&font));
+    pub fn set_font(&mut self, font: &Rc<Font>) {
+        self.base.set_font(font);
+        self.fps.set_font(font);
     }
 }

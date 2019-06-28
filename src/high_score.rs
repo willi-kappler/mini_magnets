@@ -87,7 +87,7 @@ impl HighScoreMenu {
         self.base.draw(canvas)
     }
 
-    pub fn set_font(&mut self, font: Rc<Font>) {
-        self.base.set_font(Rc::clone(&font));
+    pub fn set_font(&mut self, font: &Rc<Font>) {
+        self.base.set_font(font);
     }
 }

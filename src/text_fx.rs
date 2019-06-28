@@ -111,8 +111,8 @@ impl StaticText {
         self.adapt_width_and_height();
     }
 
-    pub fn set_font(&mut self, font: Rc<Font>) {
-        self.font = Some(font);
+    pub fn set_font(&mut self, font: &Rc<Font>) {
+        self.font = Some(Rc::clone(font));
         self.adapt_width_and_height();
     }
 
@@ -195,7 +195,7 @@ impl WaveText {
         self.active = active;
     }
 
-    pub fn set_font(&mut self, font: Rc<Font>) {
+    pub fn set_font(&mut self, font: &Rc<Font>) {
         self.base.set_font(font);
     }
 }
@@ -257,10 +257,10 @@ impl SelectableText {
         self.active = active;
     }
 
-    pub fn set_font(&mut self, font: Rc<Font>) {
-        self.base.set_font(Rc::clone(&font));
-        self.left_marker.set_font(Rc::clone(&font));
-        self.right_marker.set_font(Rc::clone(&font));
+    pub fn set_font(&mut self, font: &Rc<Font>) {
+        self.base.set_font(font);
+        self.left_marker.set_font(font);
+        self.right_marker.set_font(font);
         self.update_marker_pos();
     }
 

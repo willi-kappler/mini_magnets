@@ -152,18 +152,18 @@ impl BaseMenu {
         }
     }
 
-    pub fn set_font(&mut self, font: Rc<Font>) {
-        self.title.set_font(Rc::clone(&font));
+    pub fn set_font(&mut self, font: &Rc<Font>) {
+        self.title.set_font(font);
         self.title.center();
 
         for item in self.text.iter_mut() {
-            item.set_font(Rc::clone(&font));
+            item.set_font(font);
         }
 
         self.align_text();
 
         for item in self.menu.iter_mut() {
-            item.set_font(Rc::clone(&font));
+            item.set_font(font);
             item.center();
         }
     }

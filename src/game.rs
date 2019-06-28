@@ -167,9 +167,9 @@ impl Game {
     fn load_resources(&mut self) {
         self.load_font("assets/font2.png", 24, 24);
 
-        self.main_menu.set_font(Rc::clone(&self.fonts[0]));
-        self.credit_menu.set_font(Rc::clone(&self.fonts[0]));
-        self.high_score_menu.set_font(Rc::clone(&self.fonts[0]));
+        self.main_menu.set_font(&self.fonts[0]);
+        self.credit_menu.set_font(&self.fonts[0]);
+        self.high_score_menu.set_font(&self.fonts[0]);
 
         // println!("rc font count: {}", Rc::strong_count(&font));
     }
