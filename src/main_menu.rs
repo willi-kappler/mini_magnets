@@ -20,16 +20,16 @@ pub struct MainMenu {
 impl MainMenu {
     pub fn new() -> MainMenu {
         MainMenu {
-            base: BaseMenu::new(400, 100, 30, "MAIN MENU", Vec::new(), vec![
-                "START",
-                "AUDIO OPTIONS",
-                "GFX OPTIONS",
-                "CONTROLS",
-                "HIGH SCORE",
-                "CREDITS",
-                "EXIT",
+            base: BaseMenu::new(400, 100, 30, "MAIN MENU".to_string(), Vec::new(), vec![
+                "START".to_string(),
+                "AUDIO OPTIONS".to_string(),
+                "GFX OPTIONS".to_string(),
+                "CONTROLS".to_string(),
+                "HIGH SCORE".to_string(),
+                "CREDITS".to_string(),
+                "EXIT".to_string(),
             ]),
-            fps: StaticText::new(0, 575, "FPS"),
+            fps: StaticText::new(0, 575, "FPS".to_string()),
         }
     }
 
@@ -72,7 +72,7 @@ impl MainMenu {
     pub fn update(&mut self, fps: u32) {
         self.base.update();
         let fps_string = format!("FPS: {}", fps);
-        self.fps.set_text(&fps_string);
+        self.fps.set_text(fps_string);
     }
 
     pub fn draw(&self, canvas: &mut Canvas<Window>) {

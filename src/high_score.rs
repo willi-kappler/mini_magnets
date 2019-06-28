@@ -46,10 +46,13 @@ impl HighScore {
 
     }
 
-    fn to_text(&self) -> Vec<&str> {
+    fn to_text(&self) -> Vec<String> {
+        self.scores.iter().map(|(s, n)| format!("{} - {}", s, n)).collect::<Vec<String>>()
+/*
         let mut result: Vec<&str> = Vec::new();
 
         result
+*/
     }
 }
 
@@ -63,7 +66,7 @@ impl HighScoreMenu {
         let high_score = HighScore::new("assets/highscore.txt");
 
         HighScoreMenu {
-            base: BaseMenu::new(400, 100, 30, "CREDITS", high_score.to_text(), vec!["BACK"]),
+            base: BaseMenu::new(400, 100, 30, "CREDITS".to_string(), high_score.to_text(), vec!["BACK".to_string()]),
             high_score,
         }
     }

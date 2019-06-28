@@ -68,19 +68,19 @@ pub struct StaticText {
 }
 
 impl StaticText {
-    pub fn new(x: u32, y: u32, text: &str) -> StaticText {
+    pub fn new(x: u32, y: u32, text: String) -> StaticText {
         StaticText {
             x,
             y,
             width: 0,
             height: 0,
-            text: text.to_string(),
+            text: text,
             font: None,
         }
     }
 
     pub fn center(&mut self) {
-        if let Some(font) = &self.font {
+        if let Some(_) = &self.font {
             self.x = self.x - (self.width / 2);
         }
     }
@@ -106,8 +106,8 @@ impl StaticText {
         self.draw_at(newx, newy, canvas);
     }
 
-    pub fn set_text(&mut self, new_text: &str) {
-        self.text = new_text.to_string();
+    pub fn set_text(&mut self, new_text: String) {
+        self.text = new_text;
         self.adapt_width_and_height();
     }
 
@@ -144,7 +144,7 @@ pub struct WaveText {
 }
 
 impl WaveText {
-    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, shift: f64, text: &str) -> WaveText {
+    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, shift: f64, text: String) -> WaveText {
         WaveText {
             base: StaticText::new(x, y, text),
             amplitude,
@@ -187,7 +187,7 @@ impl WaveText {
         }
     }
 
-    pub fn set_text(&mut self, new_text: &str) {
+    pub fn set_text(&mut self, new_text: String) {
         self.base.set_text(new_text);
     }
 
@@ -210,10 +210,10 @@ pub struct SelectableText {
 }
 
 impl SelectableText {
-    pub fn new(x: u32, y: u32, max_offset: u32, text: &str) -> SelectableText {
+    pub fn new(x: u32, y: u32, max_offset: u32, text: String) -> SelectableText {
         let base = StaticText::new(x, y, text);
-        let left_marker = StaticText::new(0, y, "->");
-        let right_marker = StaticText::new(0, y, "<-");
+        let left_marker = StaticText::new(0, y, "->".to_string());
+        let right_marker = StaticText::new(0, y, "<-".to_string());
 
         SelectableText {
             base,
@@ -248,7 +248,7 @@ impl SelectableText {
         }
     }
 
-    pub fn set_text(&mut self, new_text: &str) {
+    pub fn set_text(&mut self, new_text: String) {
         self.base.set_text(new_text);
         self.update_marker_pos();
     }

@@ -50,7 +50,7 @@ pub struct BaseMenu {
 }
 
 impl BaseMenu {
-    pub fn new(x: u32, y: u32, step: u32, title: &str, text: Vec<&str>, menu: Vec<&str>) -> BaseMenu {
+    pub fn new(x: u32, y: u32, step: u32, title: String, text: Vec<String>, menu: Vec<String>) -> BaseMenu {
         let mut y2 = y;
 
         let title = WaveText::new(x, y2, (step as f64) / 2.0, 0.1, 0.5, title);
@@ -72,7 +72,7 @@ impl BaseMenu {
         }
     }
 
-    pub fn create_text(x: u32, y2: &mut u32, step: u32, text: Vec<&str>) -> Vec<StaticText> {
+    pub fn create_text(x: u32, y2: &mut u32, step: u32, text: Vec<String>) -> Vec<StaticText> {
         let mut result: Vec<StaticText> = Vec::new();
 
         if text.is_empty() {
@@ -80,7 +80,7 @@ impl BaseMenu {
         }
 
         for item in text {
-            let mut static_text = StaticText::new(x, *y2, item);
+            let static_text = StaticText::new(x, *y2, item);
             result.push(static_text);
             *y2 += step;
         }
@@ -88,7 +88,7 @@ impl BaseMenu {
         result
     }
 
-    pub fn create_menu(x: u32, y2: &mut u32, step: u32, menu: Vec<&str>) -> Vec<SelectableText> {
+    pub fn create_menu(x: u32, y2: &mut u32, step: u32, menu: Vec<String>) -> Vec<SelectableText> {
         let mut result: Vec<SelectableText> = Vec::new();
 
         if menu.is_empty() {
@@ -96,7 +96,7 @@ impl BaseMenu {
         }
 
         for item in menu {
-            let mut selectable_text = SelectableText::new(x, *y2, 30, item);
+            let selectable_text = SelectableText::new(x, *y2, 30, item);
             result.push(selectable_text);
             *y2 += step;
         }

@@ -19,14 +19,14 @@ pub struct CreditMenu {
 impl CreditMenu {
     pub fn new() -> CreditMenu {
         CreditMenu {
-            base: BaseMenu::new(400, 100, 30, "CREDITS", vec![
-                "CODE: WILLI KAPPLER",
-                "IDEA: WILLI KAPPLER",
-                "LEVELS: WILLI KAPPLER",
-                "GFX: WILLI KAPPLER",
-                "SFX: WILLI KAPPLER",
-                "MUSIC: WILLI KAPPLER",
-            ], vec!["BACK"]),
+            base: BaseMenu::new(400, 100, 30, "CREDITS".to_string(), vec![
+                "CODE: WILLI KAPPLER".to_string(),
+                "IDEA: WILLI KAPPLER".to_string(),
+                "LEVELS: WILLI KAPPLER".to_string(),
+                "GFX: WILLI KAPPLER".to_string(),
+                "SFX: WILLI KAPPLER".to_string(),
+                "MUSIC: WILLI KAPPLER".to_string(),
+            ], vec!["BACK".to_string()]),
         }
     }
 
