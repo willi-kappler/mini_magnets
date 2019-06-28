@@ -184,4 +184,12 @@ impl BaseMenu {
             item.set_x(new_x);
         }
     }
+
+    pub fn set_text(&mut self, new_text: Vec<String>) {
+        for (old, new) in self.text.iter_mut().zip(new_text.iter()) {
+            old.set_text(new.to_string());
+        }
+
+        self.align_text();
+    }
 }

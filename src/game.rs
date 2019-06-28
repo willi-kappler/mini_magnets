@@ -13,17 +13,16 @@ use sdl2::event::Event;
 use sdl2::pixels::Color;
 
 // Local modules
+use crate::settings::{GameSettings};
 use crate::text_fx::{Font};
 use crate::high_score::{HighScoreMenu};
 use crate::main_menu::{MainMenu};
 use crate::credit_menu::{CreditMenu};
 
-
-
 pub struct Game {
     pub quit: bool,
-    game_screen: GameScreen,
-    game_settings: GameSettings,
+    screen: GameScreen,
+    settings: GameSettings,
     main_menu: MainMenu,
     high_score_menu: HighScoreMenu,
     credit_menu: CreditMenu,
@@ -60,8 +59,8 @@ impl Game {
 
         Game {
             quit: false,
-            game_screen: GameScreen::new(),
-            game_settings: GameSettings::new(),
+            screen: GameScreen::new(),
+            settings: GameSettings::new(),
             main_menu: MainMenu::new(),
             high_score_menu: HighScoreMenu::new(),
             credit_menu: CreditMenu::new(),
@@ -91,6 +90,9 @@ impl Game {
 
             self.calculate_fps(instant.elapsed().as_millis());
         }
+
+        self.high_score_menu.save();
+        self.settings.save();
     }
 
     fn process(&mut self) {
@@ -101,15 +103,15 @@ impl Game {
                     self.quit = true;
                 },
                 _ => {
-                    match self.game_screen.current_screen {
+                    match self.screen.current_screen {
                         GameScreenKind::MainMenu => {
-                            self.main_menu.process(&event, &mut self.quit, &mut self.game_screen);
+                            self.main_menu.process(&event, &mut self.quit, &mut self.screen);
                         },
                         GameScreenKind::HighScoreMenu => {
-                            self.high_score_menu.process(&event, &mut self.game_screen);
+                            self.high_score_menu.process(&event, &mut self.screen);
                         },
                         GameScreenKind::CreditMenu => {
-                            self.credit_menu.process(&event, &mut self.game_screen);
+                            self.credit_menu.process(&event, &mut self.screen);
                         },
                         _ => {
                             unimplemented!();
@@ -121,7 +123,7 @@ impl Game {
     }
 
     fn update(&mut self) {
-        match self.game_screen.current_screen {
+        match self.screen.current_screen {
             GameScreenKind::MainMenu => {
                 self.main_menu.update(self.fps);
             },
@@ -141,7 +143,7 @@ impl Game {
         self.canvas.set_draw_color(Color::RGB(0, 0, 0));
         self.canvas.clear();
 
-        match self.game_screen.current_screen {
+        match self.screen.current_screen {
             GameScreenKind::MainMenu => {
                 self.main_menu.draw(&mut self.canvas)
             },
@@ -171,7 +173,8 @@ impl Game {
         self.credit_menu.set_font(&self.fonts[0]);
         self.high_score_menu.set_font(&self.fonts[0]);
 
-        // println!("rc font count: {}", Rc::strong_count(&font));
+        self.high_score_menu.load();
+        self.settings.load();
     }
 
     fn load_font<T: AsRef<Path>>(&mut self, path: T, char_width: u32, char_height: u32) {
@@ -187,25 +190,6 @@ impl Game {
         });
 
         self.fonts.push(font);
-    }
-}
-
-#[derive(Debug)]
-pub struct GameSettings {
-    pub start_level: u8,
-    pub sound_volume: u8,
-    pub music_volume: u8,
-    pub fullscreen: bool,
-}
-
-impl GameSettings {
-    pub fn new() -> GameSettings {
-        GameSettings {
-            start_level: 0,
-            sound_volume: 255,
-            music_volume: 255,
-            fullscreen: false,
-        }
     }
 }
 
