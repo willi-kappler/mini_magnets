@@ -55,6 +55,20 @@ impl BaseMenu {
         }
     }
 
+    fn create_texts(x: u32, y: u32, step: u32, max_offset: u32, texts: Vec<&str>) -> Vec<SelectableText> {
+        let mut y2 = y;
+        let mut result: Vec<SelectableText> = Vec::new();
+
+        for text in texts {
+            result.push(SelectableText::new(x, y2, max_offset, text));
+            y2 += step;
+        }
+
+        result[0].set_active(true);
+
+        result
+    }
+
     fn process(&mut self, event: &Event) {
         match event {
             Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
@@ -66,7 +80,6 @@ impl BaseMenu {
             _ => {}
         }
     }
-
 }
 
 pub struct MainMenu {
@@ -78,29 +91,15 @@ pub struct MainMenu {
 
 impl MainMenu {
     pub fn new() -> MainMenu {
-        let mut menu_items = MainMenu::create_texts(300, 150, 30, 25,
+        let menu_items = BaseMenu::create_texts(300, 150, 30, 25,
                 vec!["START", "AUDIO OPTIONS", "GFX OPTIONS", "CONTROLS", "HIGH SCORE", "EXIT"]);
 
-        menu_items[0].set_active(true);
-
         MainMenu {
-            base: BaseMenu::new(6),
+            base: BaseMenu::new(menu_items.len()),
             title: WaveText::new(300, 100, 10.0, 0.1, 0.5, "MAIN MENU"),
             fps: StaticText::new(0, 575, "FPS"),
             menu_items,
         }
-    }
-
-    fn create_texts(x: u32, y: u32, step: u32, max_offset: u32, texts: Vec<&str>) -> Vec<SelectableText> {
-        let mut y2 = y;
-        let mut result: Vec<SelectableText> = Vec::new();
-
-        for text in texts {
-            result.push(SelectableText::new(x, y2, max_offset, text));
-            y2 += step;
-        }
-
-        result
     }
 
     pub fn process(&mut self, event: &Event, quit: &mut bool) {
