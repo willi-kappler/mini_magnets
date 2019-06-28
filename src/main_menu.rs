@@ -8,7 +8,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
 // Local modules
-// use crate::game::{Game};
+use crate::game::{GameScreen};
 use crate::menu::{BaseMenu};
 use crate::text_fx::{Font, StaticText, WaveText, SelectableText};
 
@@ -22,7 +22,7 @@ pub struct MainMenu {
 impl MainMenu {
     pub fn new() -> MainMenu {
         let menu_items = BaseMenu::create_texts(300, 150, 30, 25,
-                vec!["START", "AUDIO OPTIONS", "GFX OPTIONS", "CONTROLS", "HIGH SCORE", "CREDIT", "EXIT"]);
+                vec!["START", "AUDIO OPTIONS", "GFX OPTIONS", "CONTROLS", "HIGH SCORE", "CREDITS", "EXIT"]);
 
         MainMenu {
             base: BaseMenu::new(menu_items.len()),
@@ -32,30 +32,29 @@ impl MainMenu {
         }
     }
 
-    pub fn process(&mut self, event: &Event, quit: &mut bool) {
+    pub fn process(&mut self, event: &Event, quit: &mut bool, game_screen: &mut GameScreen) {
         match event {
             Event::KeyDown { keycode: Some(Keycode::Return), .. } => {
                 match self.base.get_selected() {
                     0 => {
-                        // Start game
+                        game_screen.start_game();
                     },
                     1 => {
-                        // Audio options
+                        game_screen.audio_options();
                     },
                     2 => {
-                        // GFX options
+                        game_screen.gfx_options();
                     },
                     3 => {
-                        // Controls
+                        game_screen.controls();
                     },
                     4 => {
-                        // High Score
+                        game_screen.high_score();
                     },
                     5 => {
-                        // Credit
+                        game_screen.credit();
                     }
                     6 => {
-                        // Exit
                         *quit = true;
                     }
                     _ => {
@@ -101,7 +100,5 @@ impl MainMenu {
         for item in self.menu_items.iter_mut() {
             item.set_font(Rc::clone(&font));
         }
-
-        // println!("rc font count: {}", Rc::strong_count(&font));
     }
 }

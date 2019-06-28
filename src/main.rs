@@ -4,9 +4,10 @@
 
 // Local modules
 mod game;
+mod text_fx;
 mod menu;
 mod main_menu;
-mod text_fx;
+mod credit_menu;
 
 use game::{Game};
 

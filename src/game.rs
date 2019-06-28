@@ -13,14 +13,18 @@ use sdl2::event::Event;
 use sdl2::pixels::Color;
 
 // Local modules
-use crate::main_menu::{MainMenu};
 use crate::text_fx::{Font};
+use crate::main_menu::{MainMenu};
+use crate::credit_menu::{CreditMenu};
+
+
 
 pub struct Game {
     pub quit: bool,
     game_screen: GameScreen,
     game_settings: GameSettings,
     main_menu: MainMenu,
+    credit_menu: CreditMenu,
     frame_duration: i64,
     fps: u32,
     pub canvas: Canvas<Window>,
@@ -54,9 +58,10 @@ impl Game {
 
         Game {
             quit: false,
-            game_screen: GameScreen::MainMenu,
+            game_screen: GameScreen::new(),
             game_settings: GameSettings::new(),
             main_menu: MainMenu::new(),
+            credit_menu: CreditMenu::new(),
             frame_duration: 16,
             fps: 0,
             canvas: canvas,
@@ -93,10 +98,16 @@ impl Game {
                     self.quit = true;
                 },
                 _ => {
-                    match self.game_screen {
-                        GameScreen::MainMenu => {
-                            self.main_menu.process(&event, &mut self.quit);
+                    match self.game_screen.current_screen {
+                        GameScreenKind::MainMenu => {
+                            self.main_menu.process(&event, &mut self.quit, &mut self.game_screen);
                         },
+                        GameScreenKind::CreditMenu => {
+                            self.credit_menu.process(&event, &mut self.game_screen);
+                        },
+                        _ => {
+                            unimplemented!();
+                        }
                     }
                 }
             }
@@ -104,10 +115,16 @@ impl Game {
     }
 
     fn update(&mut self) {
-        match self.game_screen {
-            GameScreen::MainMenu => {
+        match self.game_screen.current_screen {
+            GameScreenKind::MainMenu => {
                 self.main_menu.update(self.fps);
             },
+            GameScreenKind::CreditMenu => {
+                self.credit_menu.update();
+            },
+            _ => {
+                unimplemented!();
+            }
         }
     }
 
@@ -115,10 +132,16 @@ impl Game {
         self.canvas.set_draw_color(Color::RGB(0, 0, 0));
         self.canvas.clear();
 
-        match self.game_screen {
-            GameScreen::MainMenu => {
+        match self.game_screen.current_screen {
+            GameScreenKind::MainMenu => {
                 self.main_menu.draw(&mut self.canvas)
             },
+            GameScreenKind::CreditMenu => {
+                self.credit_menu.draw(&mut self.canvas)
+            },
+            _ => {
+                unimplemented!();
+            }
         }
 
         self.canvas.present();
@@ -133,6 +156,9 @@ impl Game {
         self.load_font("assets/font2.png", 24, 24);
 
         self.main_menu.set_font(Rc::clone(&self.fonts[0]));
+        self.credit_menu.set_font(Rc::clone(&self.fonts[0]));
+
+        // println!("rc font count: {}", Rc::strong_count(&font));
     }
 
     fn load_font<T: AsRef<Path>>(&mut self, path: T, char_width: u32, char_height: u32) {
@@ -171,12 +197,53 @@ impl GameSettings {
 }
 
 #[derive(Debug)]
-pub enum GameScreen {
+pub struct GameScreen {
+    current_screen: GameScreenKind,
+}
+
+impl GameScreen {
+    pub fn new() -> GameScreen {
+        GameScreen {
+            current_screen: GameScreenKind::MainMenu,
+        }
+    }
+
+    pub fn main_menu(&mut self) {
+        self.current_screen = GameScreenKind::MainMenu;
+    }
+
+    pub fn audio_options(&mut self) {
+        self.current_screen = GameScreenKind::AudioMenu;
+    }
+
+    pub fn gfx_options(&mut self) {
+        self.current_screen = GameScreenKind::GFXMenu;
+    }
+
+    pub fn controls(&mut self) {
+        self.current_screen = GameScreenKind::ControlsMenu;
+    }
+
+    pub fn high_score(&mut self) {
+        self.current_screen = GameScreenKind::HighScoreMenu;
+    }
+
+    pub fn credit(&mut self) {
+        self.current_screen = GameScreenKind::CreditMenu;
+    }
+
+    pub fn start_game(&mut self) {
+        self.current_screen = GameScreenKind::PlayGame;
+    }
+}
+
+#[derive(Debug)]
+enum GameScreenKind {
     MainMenu,
-    /*
     AudioMenu,
     GFXMenu,
     ControlsMenu,
     HighScoreMenu,
-    */
+    CreditMenu,
+    PlayGame,
 }
