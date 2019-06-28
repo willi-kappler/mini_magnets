@@ -13,8 +13,8 @@ use sdl2::event::Event;
 use sdl2::pixels::Color;
 
 // Local modules
-use crate::menu::{MainMenu};
-use crate::draw_text::{Font};
+use crate::main_menu::{MainMenu};
+use crate::text_fx::{Font};
 
 pub struct Game {
     pub quit: bool,

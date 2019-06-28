@@ -5,7 +5,8 @@
 // Local modules
 mod game;
 mod menu;
-mod draw_text;
+mod main_menu;
+mod text_fx;
 
 use game::{Game};
 
