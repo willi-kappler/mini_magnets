@@ -14,6 +14,7 @@ use sdl2::pixels::Color;
 
 // Local modules
 use crate::text_fx::{Font};
+use crate::high_score::{HighScoreMenu};
 use crate::main_menu::{MainMenu};
 use crate::credit_menu::{CreditMenu};
 
@@ -24,6 +25,7 @@ pub struct Game {
     game_screen: GameScreen,
     game_settings: GameSettings,
     main_menu: MainMenu,
+    high_score_menu: HighScoreMenu,
     credit_menu: CreditMenu,
     frame_duration: i64,
     fps: u32,
@@ -61,6 +63,7 @@ impl Game {
             game_screen: GameScreen::new(),
             game_settings: GameSettings::new(),
             main_menu: MainMenu::new(),
+            high_score_menu: HighScoreMenu::new(),
             credit_menu: CreditMenu::new(),
             frame_duration: 16,
             fps: 0,
@@ -102,6 +105,9 @@ impl Game {
                         GameScreenKind::MainMenu => {
                             self.main_menu.process(&event, &mut self.quit, &mut self.game_screen);
                         },
+                        GameScreenKind::HighScoreMenu => {
+                            self.high_score_menu.process(&event, &mut self.game_screen);
+                        },
                         GameScreenKind::CreditMenu => {
                             self.credit_menu.process(&event, &mut self.game_screen);
                         },
@@ -119,6 +125,9 @@ impl Game {
             GameScreenKind::MainMenu => {
                 self.main_menu.update(self.fps);
             },
+            GameScreenKind::HighScoreMenu => {
+                self.high_score_menu.update();
+            },
             GameScreenKind::CreditMenu => {
                 self.credit_menu.update();
             },
@@ -135,6 +144,9 @@ impl Game {
         match self.game_screen.current_screen {
             GameScreenKind::MainMenu => {
                 self.main_menu.draw(&mut self.canvas)
+            },
+            GameScreenKind::HighScoreMenu => {
+                self.high_score_menu.draw(&mut self.canvas)
             },
             GameScreenKind::CreditMenu => {
                 self.credit_menu.draw(&mut self.canvas)
@@ -157,6 +169,7 @@ impl Game {
 
         self.main_menu.set_font(Rc::clone(&self.fonts[0]));
         self.credit_menu.set_font(Rc::clone(&self.fonts[0]));
+        self.high_score_menu.set_font(Rc::clone(&self.fonts[0]));
 
         // println!("rc font count: {}", Rc::strong_count(&font));
     }

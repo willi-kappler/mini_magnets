@@ -81,8 +81,7 @@ impl StaticText {
 
     pub fn center(&mut self) {
         if let Some(font) = &self.font {
-            let len = self.text.len() as u32;
-            self.x = self.x - ((len * font.width) / 2);
+            self.x = self.x - (self.width / 2);
         }
     }
 
@@ -122,6 +121,14 @@ impl StaticText {
             self.width = font.width * (self.text.len() as u32);
             self.height = font.height;
         }
+    }
+
+    pub fn get_width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn set_x(&mut self, x: u32) {
+        self.x = x
     }
 
     // TODO: pub fn chars() -> impl Iterator {}
@@ -220,6 +227,7 @@ impl SelectableText {
 
     pub fn center(&mut self) {
         self.base.center();
+        self.update_marker_pos();
     }
 
     pub fn draw(&self, canvas: &mut Canvas<Window>) {
@@ -227,7 +235,7 @@ impl SelectableText {
 
         if self.active {
             self.left_marker.draw_offset(-(self.offset as i32), 0, canvas);
-            self.right_marker.draw_offset((self.offset as i32), 0, canvas);
+            self.right_marker.draw_offset(self.offset as i32, 0, canvas);
         }
     }
 

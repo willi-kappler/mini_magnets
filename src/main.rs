@@ -8,6 +8,7 @@ mod text_fx;
 mod menu;
 mod main_menu;
 mod credit_menu;
+mod high_score;
 
 use game::{Game};
 
