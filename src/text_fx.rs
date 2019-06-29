@@ -134,7 +134,7 @@ impl StaticText {
     // TODO: pub fn chars() -> impl Iterator {}
 }
 
-pub struct WaveText {
+pub struct WaveVText {
     base: StaticText,
     amplitude: f64,
     phase: f64,
@@ -143,9 +143,9 @@ pub struct WaveText {
     active: bool,
 }
 
-impl WaveText {
-    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, shift: f64, text: String) -> WaveText {
-        WaveText {
+impl WaveVText {
+    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, shift: f64, text: String) -> WaveVText {
+        WaveVText {
             base: StaticText::new(x, y, text),
             amplitude,
             phase: 0.0,
@@ -172,11 +172,10 @@ impl WaveText {
         if let Some(font) = &self.base.font {
             if self.active {
                 let mut x2 = self.base.x;
-                let mut y2;
                 let mut phase = self.phase;
 
                 for c in self.base.text.chars() {
-                    y2 = self.base.y + ((self.amplitude * phase.sin()) as u32);
+                    let y2 = self.base.y + ((self.amplitude * phase.sin()) as u32);
                     font.draw_char(canvas, x2, y2, c as u8);
                     x2 += font.width;
                     phase = phase + self.shift;
@@ -193,6 +192,50 @@ impl WaveText {
 
     pub fn set_active(&mut self, active: bool) {
         self.active = active;
+    }
+
+    pub fn set_font(&mut self, font: &Rc<Font>) {
+        self.base.set_font(font);
+    }
+}
+
+pub struct WaveHText {
+    base: WaveVText,
+}
+
+impl WaveHText {
+    pub fn new(x: u32, y: u32, amplitude: f64, speed: f64, shift: f64, text: String) -> WaveHText {
+        WaveHText {
+            base: WaveVText::new(x, y, amplitude, speed, shift, text),
+        }
+    }
+
+    pub fn update(&mut self) {
+        self.base.update();
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas<Window>) {
+        if let Some(font) = &self.base.base.font {
+            if self.base.active {
+                let mut phase = self.base.phase;
+
+                for c in self.base.base.text.chars() {
+                    let x2 = self.base.base.x + ((self.base.amplitude * phase.sin()) as u32);
+                    font.draw_char(canvas, x2, self.base.base.y, c as u8);
+                    phase = phase + self.base.shift;
+                }
+            } else {
+                self.base.draw(canvas);
+            }
+        }
+    }
+
+    pub fn set_text(&mut self, new_text: String) {
+        self.base.set_text(new_text);
+    }
+
+    pub fn set_active(&mut self, active: bool) {
+        self.set_active(active);
     }
 
     pub fn set_font(&mut self, font: &Rc<Font>) {

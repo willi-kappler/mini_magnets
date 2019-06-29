@@ -8,7 +8,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
 // Local modules
-use crate::text_fx::{Font, StaticText, WaveText, SelectableText};
+use crate::text_fx::{Font, StaticText, WaveVText, SelectableText};
 
 #[derive(Debug)]
 pub struct MenuItem {
@@ -44,7 +44,7 @@ impl MenuItem {
 pub struct BaseMenu {
     x: u32,
     menu_item: MenuItem,
-    title: WaveText,
+    title: WaveVText,
     text: Vec<StaticText>,
     menu: Vec<SelectableText>,
 }
@@ -53,7 +53,7 @@ impl BaseMenu {
     pub fn new(x: u32, y: u32, step: u32, title: String, text: Vec<String>, menu: Vec<String>) -> BaseMenu {
         let mut y2 = y;
 
-        let title = WaveText::new(x, y2, (step as f64) / 2.0, 0.1, 0.5, title);
+        let title = WaveVText::new(x, y2, (step as f64) / 2.0, 0.1, 0.5, title);
         y2 += 2 * step;
 
         let text = BaseMenu::create_text(x, &mut y2, step, text);

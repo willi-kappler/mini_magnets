@@ -10,11 +10,13 @@ use sdl2::keyboard::Keycode;
 // Local modules
 use crate::game::{GameScreen};
 use crate::menu::{BaseMenu};
-use crate::text_fx::{Font, StaticText};
+use crate::text_fx::{Font, StaticText, WaveHText, WaveVText};
 
 pub struct MainMenu {
     base: BaseMenu,
     fps: StaticText,
+    greet1: WaveHText,
+    greet2: WaveVText,
 }
 
 impl MainMenu {
@@ -30,6 +32,8 @@ impl MainMenu {
                 "EXIT".to_string(),
             ]),
             fps: StaticText::new(0, 575, "FPS".to_string()),
+            greet1: WaveHText::new(400, 450, 350.0, 0.01, 0.1, "BETTINA + MANUEL".to_string()),
+            greet2: WaveVText::new(300, 550, 20.0, 0.1, 0.5, "BETTINA + MANUEL".to_string()),
         }
     }
 
@@ -73,15 +77,21 @@ impl MainMenu {
         self.base.update();
         let fps_string = format!("FPS: {}", fps);
         self.fps.set_text(fps_string);
+        self.greet1.update();
+        self.greet2.update();
     }
 
     pub fn draw(&self, canvas: &mut Canvas<Window>) {
         self.base.draw(canvas);
         self.fps.draw(canvas);
+        self.greet1.draw(canvas);
+        self.greet2.draw(canvas);
     }
 
     pub fn set_font(&mut self, font: &Rc<Font>) {
         self.base.set_font(font);
         self.fps.set_font(font);
+        self.greet1.set_font(font);
+        self.greet2.set_font(font);
     }
 }
