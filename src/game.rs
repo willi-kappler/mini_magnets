@@ -73,6 +73,7 @@ impl Game {
         }
     }
 
+     // TODO: error handling, return Result<>
     pub fn run(&mut self) {
         self.load_resources();
 
@@ -166,6 +167,7 @@ impl Game {
         self.fps = (((self.fps as f64) + fps) / 2.0) as u32;
     }
 
+     // TODO: error handling, return Result<>
     fn load_resources(&mut self) {
         self.load_font("assets/font2.png", 24, 24);
 
@@ -177,6 +179,7 @@ impl Game {
         self.settings.load();
     }
 
+     // TODO: error handling, return Result<>
     fn load_font<T: AsRef<Path>>(&mut self, path: T, char_width: u32, char_height: u32) {
         let texture = self.texture_creator.load_texture(path).unwrap();
         let texture_properties = texture.query();

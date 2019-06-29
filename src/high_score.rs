@@ -1,27 +1,30 @@
 // Rust modules
 use std::rc::Rc;
-use std::fs::File;
-use std::io::{Write, BufReader, BufRead};
+use std::fs;
+use std::error;
+use std::fmt;
+use std::io;
 
 // External modules
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use serde_derive::{Serialize, Deserialize};
+use serde_json;
 
 // Local modules
 use crate::game::{GameScreen};
 use crate::menu::{BaseMenu};
 use crate::text_fx::{Font};
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct HighScore {
     scores: Vec<(u32, String)>,
-    filename: String,
 }
 
 impl HighScore {
-    fn new(filename: String) -> HighScore {
+    fn new() -> HighScore {
         HighScore {
             scores: vec![
                 (1000, "WILLI KAPPLER".to_string()),
@@ -35,31 +38,6 @@ impl HighScore {
                  (200, "WILLI KAPPLER".to_string()),
                  (100, "WILLI KAPPLER".to_string()),
             ],
-            filename,
-        }
-    }
-
-    fn load(&mut self) {
-        let input = File::open(&self.filename).unwrap();
-        let buffered = BufReader::new(input);
-
-        for (line, score) in buffered.lines().zip(self.scores.iter_mut()) {
-            let line = line.unwrap();
-            let values: Vec<&str> = line.split(',').collect();
-            if values.len() == 2 {
-                score.0 = values[0].parse::<u32>().unwrap();
-                score.1 = values[1].trim().to_string();
-            }
-        }
-
-        self.scores.sort_by(|item1, item2| item2.0.cmp(&item1.0));
-    }
-
-    fn save(&self) {
-        let mut output = File::create(&self.filename).unwrap();
-
-        for (s, n) in self.scores.iter() {
-            write!(output, "{}, {}\n", s, n).unwrap();
         }
     }
 
@@ -71,15 +49,17 @@ impl HighScore {
 pub struct HighScoreMenu {
     base: BaseMenu,
     high_score: HighScore,
+    filename: String,
 }
 
 impl HighScoreMenu {
     pub fn new() -> HighScoreMenu {
-        let high_score = HighScore::new("assets/highscore.txt".to_string());
+        let high_score = HighScore::new();
 
         HighScoreMenu {
             base: BaseMenu::new(400, 100, 30, "CREDITS".to_string(), high_score.to_text(), vec!["BACK".to_string()]),
             high_score,
+            filename: "assets/highscore.json".to_string(),
         }
     }
 
@@ -104,14 +84,65 @@ impl HighScoreMenu {
 
     pub fn set_font(&mut self, font: &Rc<Font>) {
         self.base.set_font(font);
-    }
-
-    pub fn load(&mut self) {
-        self.high_score.load();
         self.base.set_text(self.high_score.to_text());
     }
 
-    pub fn save(&self) {
-        self.high_score.save();
+    pub fn load(&mut self) -> Result<(), HighScoreError> {
+        let data = fs::read_to_string(&self.filename)?;
+        self.high_score = serde_json::from_str(&data)?;
+        self.base.set_text(self.high_score.to_text());
+
+        Ok(())
+    }
+
+    pub fn save(&self) -> Result<(), HighScoreError> {
+        let data = serde_json::to_string(&self.high_score)?;
+        fs::write(&self.filename, data)?;
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub enum HighScoreError {
+    IOError,
+    ParseError,
+}
+
+impl fmt::Display for HighScoreError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            HighScoreError::IOError => {
+                write!(f, "IO error while accessing the high score file")
+            },
+            HighScoreError::ParseError => {
+                write!(f, "Parse error while accessing the high score file")
+            },
+        }
+    }
+}
+
+impl error::Error for HighScoreError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match *self {
+            HighScoreError::IOError => {
+                None // TODO: source io error
+            },
+            HighScoreError::ParseError => {
+                None // TODO: source parse error
+            },
+        }
+    }
+}
+
+impl From<io::Error> for HighScoreError {
+    fn from(err: io::Error) -> HighScoreError {
+        HighScoreError::IOError
+    }
+}
+
+impl From<serde_json::error::Error> for HighScoreError {
+    fn from(err: serde_json::error::Error) -> HighScoreError {
+        HighScoreError::ParseError
     }
 }
