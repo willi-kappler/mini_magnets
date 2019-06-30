@@ -3,7 +3,7 @@ use std::rc::Rc;
 use std::fs;
 use std::error;
 use std::fmt;
-use std::io;
+use std::io::Error as StdIOError;
 
 // External modules
 use sdl2::render::Canvas;
@@ -11,7 +11,7 @@ use sdl2::video::Window;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use serde_derive::{Serialize, Deserialize};
-use serde_json;
+use serde_json::error::Error as JSONError;
 
 // Local modules
 use crate::game::{GameScreen};
@@ -105,18 +105,18 @@ impl HighScoreMenu {
 
 #[derive(Debug)]
 pub enum HighScoreError {
-    IOError,
-    ParseError,
+    IOError(StdIOError),
+    ParseError(JSONError),
 }
 
 impl fmt::Display for HighScoreError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            HighScoreError::IOError => {
-                write!(f, "IO error while accessing the high score file")
+            HighScoreError::IOError(ref e) => {
+                write!(f, "IO error while accessing the high score file: {}", e)
             },
-            HighScoreError::ParseError => {
-                write!(f, "Parse error while accessing the high score file")
+            HighScoreError::ParseError(ref e) => {
+                write!(f, "Parse error while accessing the high score file: {}", e)
             },
         }
     }
@@ -125,24 +125,24 @@ impl fmt::Display for HighScoreError {
 impl error::Error for HighScoreError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
-            HighScoreError::IOError => {
-                None // TODO: source io error
+            HighScoreError::IOError(ref e) => {
+                Some(e)
             },
-            HighScoreError::ParseError => {
-                None // TODO: source parse error
+            HighScoreError::ParseError(ref e) => {
+                Some(e)
             },
         }
     }
 }
 
-impl From<io::Error> for HighScoreError {
-    fn from(err: io::Error) -> HighScoreError {
-        HighScoreError::IOError
+impl From<StdIOError> for HighScoreError {
+    fn from(e: StdIOError) -> HighScoreError {
+        HighScoreError::IOError(e)
     }
 }
 
-impl From<serde_json::error::Error> for HighScoreError {
-    fn from(err: serde_json::error::Error) -> HighScoreError {
-        HighScoreError::ParseError
+impl From<JSONError> for HighScoreError {
+    fn from(e: JSONError) -> HighScoreError {
+        HighScoreError::ParseError(e)
     }
 }
