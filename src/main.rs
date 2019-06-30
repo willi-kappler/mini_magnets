@@ -30,5 +30,18 @@ use game::{Game};
 
 
 pub fn main() {
-     Game::new().run();
+     match Game::new() {
+          Err(e) => {
+               println!("SDL init error occured: {}", e);
+          },
+          Ok(mut game) => {
+               match game.run() {
+                    Err(e) => {
+                         println!("An error occured: {}", e);
+                    },
+                    Ok(_) => {
+                    }
+               }
+          }
+     }
 }

@@ -10,7 +10,7 @@ use sdl2::keyboard::Keycode;
 // Local modules
 use crate::game::{GameScreen};
 use crate::menu::{BaseMenu};
-use crate::text_fx::{Font, StaticText, WaveHText, WaveVText};
+use crate::text_fx::{Font, StaticText};
 
 pub struct MainMenu {
     base: BaseMenu,

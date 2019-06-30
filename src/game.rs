@@ -3,14 +3,18 @@ use std::path::Path;
 use std::time::{Instant, Duration};
 use std::thread;
 use std::rc::Rc;
+use std::error;
+use std::fmt;
+use std::io::Error as StdIOError;
 
 // External modules
 use sdl2::render::{TextureCreator, Canvas};
-use sdl2::video::{Window, WindowContext};
+use sdl2::video::{Window, WindowContext, WindowBuildError};
 use sdl2::image::{LoadTexture, InitFlag};
 use sdl2::EventPump;
 use sdl2::event::Event;
 use sdl2::pixels::Color;
+use sdl2::IntegerOrSdlError;
 
 // Local modules
 use crate::settings::{GameSettings};
@@ -35,29 +39,32 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new() -> Game {
-        let sdl_context = sdl2::init().unwrap();
-        let video_subsystem = sdl_context.video().unwrap();
+    pub fn new() -> Result<Game, GameError> {
+        let sdl_context = sdl2::init()
+            .map_err(|e| GameError::SDLInit(e))?;
+        let video_subsystem = sdl_context.video()
+            .map_err(|e| GameError::SDLVideo(e))?;
 
         let window = video_subsystem.window("Mini-Magnets", 800, 600)
             .position_centered()
-            .build()
-            .unwrap();
+            .build()?;
 
-        let mut canvas = window.into_canvas().accelerated().build().unwrap();
-        // let mut canvas = window.into_canvas().build().unwrap();
+        let mut canvas = window.into_canvas().accelerated().build()?;
+        // let mut canvas = window.into_canvas().build().map_err(|e| GameError::SDLCanvas(e))?;
         let texture_creator = canvas.texture_creator();
 
         // Activate support fot PNG and JPG image file format
-        let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG).unwrap();
+        let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)
+            .map_err(|e| GameError::SDLImage(e))?;
 
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         canvas.present();
 
-        let event_pump = sdl_context.event_pump().unwrap();
+        let event_pump = sdl_context.event_pump()
+            .map_err(|e| GameError::SDLEventPump(e))?;
 
-        Game {
+        Ok(Game {
             quit: false,
             screen: GameScreen::new(),
             settings: GameSettings::new(),
@@ -70,12 +77,11 @@ impl Game {
             event_pump: event_pump,
             texture_creator: texture_creator,
             fonts: Vec::new(),
-        }
+        })
     }
 
-     // TODO: error handling, return Result<>
-    pub fn run(&mut self) {
-        self.load_resources();
+    pub fn run(&mut self) -> Result<(), GameError> {
+        self.load_resources()?;
 
         while !self.quit {
             let instant = Instant::now();
@@ -92,8 +98,23 @@ impl Game {
             self.calculate_fps(instant.elapsed().as_millis());
         }
 
-        self.high_score_menu.save();
-        self.settings.save();
+        match self.high_score_menu.save() {
+            Err(e) => {
+                println!("Could not save high score table: {}", e);
+            },
+            _ => {
+            }
+        }
+
+        match self.settings.save() {
+            Err(e) => {
+                println!("Could not save settings: {}", e);
+            },
+            _ => {                
+            }
+        }
+
+        Ok(())
     }
 
     fn process(&mut self) {
@@ -167,21 +188,35 @@ impl Game {
         self.fps = (((self.fps as f64) + fps) / 2.0) as u32;
     }
 
-     // TODO: error handling, return Result<>
-    fn load_resources(&mut self) {
-        self.load_font("assets/font2.png", 24, 24);
+    fn load_resources(&mut self) -> Result<(), GameError> {
+        self.load_font("assets/font2.png", 24, 24)?;
 
         self.main_menu.set_font(&self.fonts[0]);
         self.credit_menu.set_font(&self.fonts[0]);
         self.high_score_menu.set_font(&self.fonts[0]);
 
-        self.high_score_menu.load();
-        self.settings.load();
+        match self.high_score_menu.load() {
+            Err(e) => {
+                println!("Could not load high score talbe ({}), using default", e);
+            },
+            _ => {
+            }
+        }
+
+        match self.settings.load() {
+            Err(e) => {
+                println!("Could not load settings ({}), using default", e);
+            },
+            _ => {
+            }
+        }
+
+        Ok(())
     }
 
-     // TODO: error handling, return Result<>
-    fn load_font<T: AsRef<Path>>(&mut self, path: T, char_width: u32, char_height: u32) {
-        let texture = self.texture_creator.load_texture(path).unwrap();
+    fn load_font<T: AsRef<Path>>(&mut self, path: T, char_width: u32, char_height: u32) -> Result<(), GameError> {
+        let texture = self.texture_creator.load_texture(path)
+            .map_err(|e| GameError::SDLTextureLoad(e))?;
         let texture_properties = texture.query();
 
         let font = Rc::new(Font {
@@ -193,6 +228,8 @@ impl Game {
         });
 
         self.fonts.push(font);
+
+        Ok(())
     }
 }
 
@@ -246,4 +283,78 @@ enum GameScreenKind {
     HighScoreMenu,
     CreditMenu,
     PlayGame,
+}
+
+#[derive(Debug)]
+pub enum GameError {
+    IOError(StdIOError),
+    SDLTextureLoad(String),
+    SDLInit(String),
+    SDLVideo(String),
+    SDLWindow(WindowBuildError),
+    SDLCanvas(IntegerOrSdlError),
+    SDLImage(String),
+    SDLEventPump(String),
+}
+
+impl fmt::Display for GameError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            GameError::IOError(ref e) => {
+                write!(f, "IO error while accessing the high score file: {}", e)
+            },
+            GameError::SDLTextureLoad(ref e) => {
+                write!(f, "Could not load Texture: {}", e)
+            },
+            GameError::SDLInit(ref e) => {
+                write!(f, "Could not initialize SDL: {}", e)
+            },
+            GameError::SDLVideo(ref e) => {
+                write!(f, "Could not initialize SDL video: {}", e)
+            },
+            GameError::SDLWindow(ref e) => {
+                write!(f, "Could not initialize SDL window: {}", e)
+            },
+            GameError::SDLCanvas(ref e) => {
+                write!(f, "Could not initialize SDL canvas: {}", e)
+            },
+            GameError::SDLImage(ref e) => {
+                write!(f, "Could not initialize SDL image: {}", e)
+            },
+            GameError::SDLEventPump(ref e) => {
+                write!(f, "Could not initialize SDL event pump: {}", e)
+            },
+        }
+    }
+}
+
+impl error::Error for GameError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match *self {
+            GameError::IOError(ref e) => {
+                Some(e)
+            },
+            GameError::SDLWindow(ref e) => {
+                Some(e)
+            },
+            GameError::SDLCanvas(ref e) => {
+                Some(e)
+            },
+            _ => {
+                None
+            },
+        }
+    }
+}
+
+impl From<WindowBuildError> for GameError {
+    fn from(e: WindowBuildError) -> GameError {
+        GameError::SDLWindow(e)
+    }
+}
+
+impl From<IntegerOrSdlError> for GameError {
+    fn from(e: IntegerOrSdlError) -> GameError {
+        GameError::SDLCanvas(e)
+    }
 }

@@ -235,7 +235,7 @@ impl WaveHText {
     }
 
     pub fn set_active(&mut self, active: bool) {
-        self.set_active(active);
+        self.base.set_active(active);
     }
 
     pub fn set_font(&mut self, font: &Rc<Font>) {
