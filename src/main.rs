@@ -8,6 +8,8 @@ mod settings;
 mod text_fx;
 mod menu;
 mod main_menu;
+mod audio_menu;
+mod gfx_menu;
 mod credit_menu;
 mod high_score;
 

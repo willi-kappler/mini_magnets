@@ -19,8 +19,9 @@ use sdl2::IntegerOrSdlError;
 // Local modules
 use crate::settings::{GameSettings};
 use crate::text_fx::{Font};
-use crate::high_score::{HighScoreMenu};
 use crate::main_menu::{MainMenu};
+use crate::audio_menu::{AudioMenu};
+use crate::high_score::{HighScoreMenu};
 use crate::credit_menu::{CreditMenu};
 
 pub struct Game {
@@ -28,6 +29,7 @@ pub struct Game {
     screen: GameScreen,
     settings: GameSettings,
     main_menu: MainMenu,
+    audio_menu: AudioMenu,
     high_score_menu: HighScoreMenu,
     credit_menu: CreditMenu,
     frame_duration: i64,
@@ -69,6 +71,7 @@ impl Game {
             screen: GameScreen::new(),
             settings: GameSettings::new(),
             main_menu: MainMenu::new(),
+            audio_menu: AudioMenu::new(),
             high_score_menu: HighScoreMenu::new(),
             credit_menu: CreditMenu::new(),
             frame_duration: 16,
@@ -129,6 +132,9 @@ impl Game {
                         GameScreenKind::MainMenu => {
                             self.main_menu.process(&event, &mut self.quit, &mut self.screen);
                         },
+                        GameScreenKind::AudioMenu => {
+                            self.audio_menu.process(&event, &mut self.screen, &mut self.settings);
+                        },
                         GameScreenKind::HighScoreMenu => {
                             self.high_score_menu.process(&event, &mut self.screen);
                         },
@@ -136,7 +142,8 @@ impl Game {
                             self.credit_menu.process(&event, &mut self.screen);
                         },
                         _ => {
-                            unimplemented!();
+                            println!("Not implemented yet!");
+                            self.screen.current_screen = GameScreenKind::MainMenu;
                         }
                     }
                 }
@@ -149,6 +156,9 @@ impl Game {
             GameScreenKind::MainMenu => {
                 self.main_menu.update(self.fps);
             },
+            GameScreenKind::AudioMenu => {
+                self.audio_menu.update();
+            },
             GameScreenKind::HighScoreMenu => {
                 self.high_score_menu.update();
             },
@@ -156,7 +166,8 @@ impl Game {
                 self.credit_menu.update();
             },
             _ => {
-                unimplemented!();
+                println!("Not implemented yet!");
+                self.screen.current_screen = GameScreenKind::MainMenu;
             }
         }
     }
@@ -169,6 +180,9 @@ impl Game {
             GameScreenKind::MainMenu => {
                 self.main_menu.draw(&mut self.canvas)
             },
+            GameScreenKind::AudioMenu => {
+                self.audio_menu.draw(&mut self.canvas)
+            },
             GameScreenKind::HighScoreMenu => {
                 self.high_score_menu.draw(&mut self.canvas)
             },
@@ -176,7 +190,8 @@ impl Game {
                 self.credit_menu.draw(&mut self.canvas)
             },
             _ => {
-                unimplemented!();
+                println!("Not implemented yet!");
+                self.screen.current_screen = GameScreenKind::MainMenu;
             }
         }
 
@@ -194,6 +209,7 @@ impl Game {
         self.main_menu.set_font(&self.fonts[0]);
         self.credit_menu.set_font(&self.fonts[0]);
         self.high_score_menu.set_font(&self.fonts[0]);
+        self.audio_menu.set_font(&self.fonts[0]);
 
         match self.high_score_menu.load() {
             Err(e) => {
@@ -210,6 +226,8 @@ impl Game {
             _ => {
             }
         }
+
+        self.audio_menu.update_settings(&self.settings);
 
         Ok(())
     }

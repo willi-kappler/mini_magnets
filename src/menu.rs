@@ -192,4 +192,10 @@ impl BaseMenu {
 
         self.align_text();
     }
+
+    pub fn change_menu(&mut self, index: usize, new_text: String) {
+        self.menu[index].set_text(new_text);
+        self.menu[index].set_x(self.x);
+        self.menu[index].center();
+    }
 }

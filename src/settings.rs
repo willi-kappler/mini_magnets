@@ -9,7 +9,6 @@ use std::io::Error as StdIOError;
 use serde_derive::{Serialize, Deserialize};
 use serde_json::error::Error as JSONError;
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GameSettings {
     start_level: u8,
@@ -60,6 +59,10 @@ impl GameSettings {
         }
     }
 
+    pub fn get_sound_vol(&self) -> u8 {
+        self.sound_volume
+    }
+
     pub fn inc_music_vol(&mut self) {
         if self.music_volume < 255 {
             self.music_volume += 1;
@@ -72,6 +75,10 @@ impl GameSettings {
         }
     }
 
+    pub fn get_music_vol(&self) -> u8 {
+        self.music_volume
+    }
+
     pub fn toggle_fullscreen(&mut self) {
         self.fullscreen = !self.fullscreen;
     }
@@ -79,12 +86,16 @@ impl GameSettings {
     pub fn inc_resolution(&mut self) {
         if self.resolution < 3 {
             self.resolution += 1;
+        } else {
+            self.resolution = 0;
         }
     }
 
     pub fn dec_resolution(&mut self) {
         if self.resolution > 0 {
             self.resolution -= 1;
+        } else {
+            self.resolution = 3;
         }
     }
 

@@ -219,6 +219,8 @@ impl WaveHText {
             if self.base.active {
                 let mut phase = self.base.phase;
 
+                // base.base. is ugly, maybe use Deref Trait ? 
+                // https://doc.rust-lang.org/std/ops/trait.Deref.html 
                 for c in self.base.base.text.chars() {
                     let x2 = self.base.base.x + ((self.base.amplitude * phase.sin()) as u32);
                     font.draw_char(canvas, x2, self.base.base.y, c as u8);
@@ -310,5 +312,10 @@ impl SelectableText {
     fn update_marker_pos(&mut self) {
         self.left_marker.x = self.base.x - self.left_marker.width - self.max_offset;
         self.right_marker.x = self.base.x + self.base.width + self.max_offset;
+    }
+
+    pub fn set_x(&mut self, x: u32) {
+        self.base.set_x(x);
+        self.update_marker_pos();
     }
 }
