@@ -49,7 +49,7 @@ impl HighScore {
 pub struct HighScoreMenu {
     base: BaseMenu,
     high_score: HighScore,
-    filename: String,
+    filepath: String,
 }
 
 impl HighScoreMenu {
@@ -59,7 +59,7 @@ impl HighScoreMenu {
         HighScoreMenu {
             base: BaseMenu::new(400, 100, 30, "CREDITS".to_string(), high_score.to_text(), vec!["BACK".to_string()]),
             high_score,
-            filename: "assets/highscore.json".to_string(),
+            filepath: "assets/highscore.json".to_string(),
         }
     }
 
@@ -88,7 +88,8 @@ impl HighScoreMenu {
     }
 
     pub fn load(&mut self) -> Result<(), HighScoreError> {
-        let data = fs::read_to_string(&self.filename)?;
+        let data = fs::read_to_string(&self.filepath)
+            .map_err(|e| HighScoreError::ReadError(e, self.filepath.clone()))?;
         self.high_score = serde_json::from_str(&data)?;
         self.base.set_text(self.high_score.to_text());
 
@@ -97,7 +98,8 @@ impl HighScoreMenu {
 
     pub fn save(&self) -> Result<(), HighScoreError> {
         let data = serde_json::to_string(&self.high_score)?;
-        fs::write(&self.filename, data)?;
+        fs::write(&self.filepath, data)
+            .map_err(|e| HighScoreError::WriteError(e, self.filepath.clone()))?;
 
         Ok(())
     }
@@ -105,15 +107,19 @@ impl HighScoreMenu {
 
 #[derive(Debug)]
 pub enum HighScoreError {
-    IOError(StdIOError),
+    ReadError(StdIOError, String),
+    WriteError(StdIOError, String),
     ParseError(JSONError),
 }
 
 impl fmt::Display for HighScoreError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            HighScoreError::IOError(ref e) => {
-                write!(f, "IO error while accessing the high score file: {}", e)
+            HighScoreError::ReadError(ref e, ref path) => {
+                write!(f, "IO error while reading the high score file: '{}', {}", path, e)
+            },
+            HighScoreError::WriteError(ref e, ref path) => {
+                write!(f, "IO error while writing the high score file: '{}', {}", path, e)
             },
             HighScoreError::ParseError(ref e) => {
                 write!(f, "Parse error while accessing the high score file: {}", e)
@@ -125,19 +131,16 @@ impl fmt::Display for HighScoreError {
 impl error::Error for HighScoreError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
-            HighScoreError::IOError(ref e) => {
+            HighScoreError::ReadError(ref e, _) => {
+                Some(e)
+            },
+            HighScoreError::WriteError(ref e, _) => {
                 Some(e)
             },
             HighScoreError::ParseError(ref e) => {
                 Some(e)
             },
         }
-    }
-}
-
-impl From<StdIOError> for HighScoreError {
-    fn from(e: StdIOError) -> HighScoreError {
-        HighScoreError::IOError(e)
     }
 }
 
