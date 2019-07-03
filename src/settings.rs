@@ -23,8 +23,8 @@ impl GameSettings {
     pub fn new() -> GameSettings {
         GameSettings {
             start_level: 0,
-            sound_volume: 255,
-            music_volume: 255,
+            sound_volume: 200,
+            music_volume: 200,
             fullscreen: false,
             resolution: 0,
             filepath: "assets/settings.json".to_string(),
@@ -48,14 +48,22 @@ impl GameSettings {
     }
 
     pub fn inc_sound_vol(&mut self) {
-        if self.sound_volume < 255 {
-            self.sound_volume += 1;
+        let new_volume: i16 = (self.sound_volume as i16) + 5;
+
+        if new_volume > 255 {
+            self.sound_volume = 255;
+        } else {
+            self.sound_volume = new_volume as u8;
         }
     }
 
     pub fn dec_sound_vol(&mut self) {
-        if self.sound_volume > 0 {
-            self.sound_volume -= 1;
+        let new_volume: i16 = (self.sound_volume as i16) - 5;
+
+        if new_volume < 0 {
+            self.sound_volume = 0;
+        } else {
+            self.sound_volume = new_volume as u8;
         }
     }
 
@@ -64,14 +72,22 @@ impl GameSettings {
     }
 
     pub fn inc_music_vol(&mut self) {
-        if self.music_volume < 255 {
-            self.music_volume += 1;
+        let new_volume: i16 = (self.music_volume as i16) + 5;
+
+        if new_volume > 255 {
+            self.music_volume = 255;
+        } else {
+            self.music_volume = new_volume as u8;
         }
     }
 
     pub fn dec_music_vol(&mut self) {
-        if self.music_volume > 0 {
-            self.music_volume -= 1;
+        let new_volume: i16 = (self.music_volume as i16) - 5;
+
+        if new_volume < 0 {
+            self.music_volume = 0;
+        } else {
+            self.music_volume = new_volume as u8;
         }
     }
 
