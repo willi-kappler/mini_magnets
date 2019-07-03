@@ -32,6 +32,11 @@ use game::{Game};
 // Maybe use deleagte:
 // https://github.com/chancancode/rust-delegate
 
+// For audio playback use rodio:
+// https://github.com/tomaka/rodio
+// https://docs.rs/rodio/0.9.0/rodio/
+
+
 
 pub fn main() {
      match Game::new() {
