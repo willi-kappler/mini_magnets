@@ -29,6 +29,8 @@ use game::{Game};
 // Key Codes:
 // https://rust-sdl2.github.io/rust-sdl2/sdl2/keyboard/enum.Keycode.html
 
+// Maybe use deleagte:
+// https://github.com/chancancode/rust-delegate
 
 
 pub fn main() {
