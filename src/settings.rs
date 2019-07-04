@@ -9,13 +9,16 @@ use std::io::Error as StdIOError;
 use serde_derive::{Serialize, Deserialize};
 use serde_json::error::Error as JSONError;
 
+const MAX_VOLUME: i16 = 255;
+const MAX_RESOLUTION: i16 = 255;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GameSettings {
     start_level: u8,
-    sound_volume: u8,
-    music_volume: u8,
+    sound_volume: i16,
+    music_volume: i16,
     fullscreen: bool,
-    resolution: u8,
+    resolution: i16,
     filepath: String,
 }
 
@@ -48,50 +51,30 @@ impl GameSettings {
     }
 
     pub fn inc_sound_vol(&mut self) {
-        let new_volume: i16 = (self.sound_volume as i16) + 5;
-
-        if new_volume > 255 {
-            self.sound_volume = 255;
-        } else {
-            self.sound_volume = new_volume as u8;
-        }
+        self.sound_volume += 5;
+        limit_range(&mut self.sound_volume, 0, MAX_VOLUME);
     }
 
     pub fn dec_sound_vol(&mut self) {
-        let new_volume: i16 = (self.sound_volume as i16) - 5;
-
-        if new_volume < 0 {
-            self.sound_volume = 0;
-        } else {
-            self.sound_volume = new_volume as u8;
-        }
+        self.sound_volume -= 5;
+        limit_range(&mut self.sound_volume, 0, MAX_VOLUME);
     }
 
-    pub fn get_sound_vol(&self) -> u8 {
+    pub fn get_sound_vol(&self) -> i16 {
         self.sound_volume
     }
 
     pub fn inc_music_vol(&mut self) {
-        let new_volume: i16 = (self.music_volume as i16) + 5;
-
-        if new_volume > 255 {
-            self.music_volume = 255;
-        } else {
-            self.music_volume = new_volume as u8;
-        }
+        self.music_volume += 5;
+        limit_range(&mut self.music_volume, 0, MAX_VOLUME);
     }
 
     pub fn dec_music_vol(&mut self) {
-        let new_volume: i16 = (self.music_volume as i16) - 5;
-
-        if new_volume < 0 {
-            self.music_volume = 0;
-        } else {
-            self.music_volume = new_volume as u8;
-        }
+        self.music_volume -= 5;
+        limit_range(&mut self.music_volume, 0, MAX_VOLUME);
     }
 
-    pub fn get_music_vol(&self) -> u8 {
+    pub fn get_music_vol(&self) -> i16 {
         self.music_volume
     }
 
@@ -100,19 +83,13 @@ impl GameSettings {
     }
 
     pub fn inc_resolution(&mut self) {
-        if self.resolution < 3 {
-            self.resolution += 1;
-        } else {
-            self.resolution = 0;
-        }
+        self.resolution += 1;
+        limit_range(&mut self.resolution, 0, MAX_RESOLUTION);
     }
 
     pub fn dec_resolution(&mut self) {
-        if self.resolution > 0 {
-            self.resolution -= 1;
-        } else {
-            self.resolution = 3;
-        }
+        self.resolution -= 1;
+        limit_range(&mut self.resolution, 0, MAX_RESOLUTION);
     }
 
     pub fn resolution_to_text(&self) -> String {
@@ -170,5 +147,13 @@ impl error::Error for SettingsError {
 impl From<JSONError> for SettingsError {
     fn from(e: JSONError) -> SettingsError {
         SettingsError::ParseError(e)
+    }
+}
+
+fn limit_range(value: &mut i16, low: i16, high: i16) {
+    if *value < low {
+        *value = low;
+    } else if *value > high {
+        *value = high;
     }
 }
