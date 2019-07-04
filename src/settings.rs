@@ -10,7 +10,7 @@ use serde_derive::{Serialize, Deserialize};
 use serde_json::error::Error as JSONError;
 
 const MAX_VOLUME: i16 = 255;
-const MAX_RESOLUTION: i16 = 255;
+const MAX_RESOLUTION: i16 = 3;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GameSettings {
@@ -34,7 +34,7 @@ impl GameSettings {
         }
     }
 
-    pub fn load(&mut self) -> Result<(), SettingsError>{
+    pub fn load(&mut self) -> Result<(), SettingsError> {
         let data = fs::read_to_string(&self.filepath)
             .map_err(|e| SettingsError::ReadError(e, self.filepath.clone()))?;
         *self = serde_json::from_str(&data)?;
@@ -82,6 +82,10 @@ impl GameSettings {
         self.fullscreen = !self.fullscreen;
     }
 
+    pub fn get_fullscreen(&self) -> bool {
+        self.fullscreen
+    }
+
     pub fn inc_resolution(&mut self) {
         self.resolution += 1;
         limit_range(&mut self.resolution, 0, MAX_RESOLUTION);
@@ -90,6 +94,10 @@ impl GameSettings {
     pub fn dec_resolution(&mut self) {
         self.resolution -= 1;
         limit_range(&mut self.resolution, 0, MAX_RESOLUTION);
+    }
+
+    pub fn get_resolution(&self) -> i16 {
+        self.resolution
     }
 
     pub fn resolution_to_text(&self) -> String {

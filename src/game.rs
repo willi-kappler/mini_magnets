@@ -21,6 +21,7 @@ use crate::settings::{GameSettings};
 use crate::text_fx::{Font};
 use crate::main_menu::{MainMenu};
 use crate::audio_menu::{AudioMenu};
+use crate::gfx_menu::{GFXMenu};
 use crate::high_score::{HighScoreMenu};
 use crate::credit_menu::{CreditMenu};
 
@@ -30,6 +31,7 @@ pub struct Game {
     settings: GameSettings,
     main_menu: MainMenu,
     audio_menu: AudioMenu,
+    gfx_menu: GFXMenu,
     high_score_menu: HighScoreMenu,
     credit_menu: CreditMenu,
     frame_duration: i64,
@@ -72,6 +74,7 @@ impl Game {
             settings: GameSettings::new(),
             main_menu: MainMenu::new(),
             audio_menu: AudioMenu::new(),
+            gfx_menu: GFXMenu::new(),
             high_score_menu: HighScoreMenu::new(),
             credit_menu: CreditMenu::new(),
             frame_duration: 16,
@@ -135,6 +138,9 @@ impl Game {
                         GameScreenKind::AudioMenu => {
                             self.audio_menu.process(&event, &mut self.screen, &mut self.settings);
                         },
+                        GameScreenKind::GFXMenu => {
+                            self.gfx_menu.process(&event, &mut self.screen, &mut self.settings);
+                        },
                         GameScreenKind::HighScoreMenu => {
                             self.high_score_menu.process(&event, &mut self.screen);
                         },
@@ -159,6 +165,9 @@ impl Game {
             GameScreenKind::AudioMenu => {
                 self.audio_menu.update();
             },
+            GameScreenKind::GFXMenu => {
+                self.gfx_menu.update();
+            },
             GameScreenKind::HighScoreMenu => {
                 self.high_score_menu.update();
             },
@@ -182,6 +191,9 @@ impl Game {
             },
             GameScreenKind::AudioMenu => {
                 self.audio_menu.draw(&mut self.canvas)
+            },
+            GameScreenKind::GFXMenu => {
+                self.gfx_menu.draw(&mut self.canvas)
             },
             GameScreenKind::HighScoreMenu => {
                 self.high_score_menu.draw(&mut self.canvas)
@@ -210,6 +222,7 @@ impl Game {
         self.credit_menu.set_font(&self.fonts[0]);
         self.high_score_menu.set_font(&self.fonts[0]);
         self.audio_menu.set_font(&self.fonts[0]);
+        self.gfx_menu.set_font(&self.fonts[0]);
 
         match self.high_score_menu.load() {
             Err(e) => {
@@ -228,6 +241,7 @@ impl Game {
         }
 
         self.audio_menu.update_settings(&self.settings);
+        self.gfx_menu.update_settings(&self.settings);
 
         Ok(())
     }
