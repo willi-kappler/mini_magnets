@@ -36,6 +36,7 @@ use game::{Game};
 // https://github.com/tomaka/rodio
 // https://docs.rs/rodio/0.9.0/rodio/
 
+// Maybe use miniFB: https://github.com/emoon/rust_minifb
 
 
 pub fn main() {
